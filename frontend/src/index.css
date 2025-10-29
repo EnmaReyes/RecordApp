@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Puedes poner variables CSS para colores de la marca aquí */
+:root{
+  --brand-1: #0f766e;
+  --brand-2: #064e3b;
+}
