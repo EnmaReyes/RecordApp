@@ -1,48 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import RatesGrid from "./components/RatesGrid";
 import Header from "./components/Header";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ExchangeHero from "./components/ExchangeHero";
 import sampleData from "./data/SampleData.jsx";
+import CurrencyTable from "./components/CurrencyTable.jsx";
+import {
+  CurrencyProvider,
+  useCurrencies,
+} from "./context/CurrencyProvider.jsx";
 
-export default function App() {
+// 🧠 Este componente sí puede usar el contexto
+function AppContent() {
   const [rates, setRates] = useState(sampleData);
-  const [loading, setLoading] = useState(false);
-
-  // ejemplo: función para refrescar (podés sustituir por llamada real a tu API)
-  async function refreshRates() {
-    setLoading(true);
-    try {
-      // Si querés usar API, cambia aquí la llamada (fetch/axios) y formatea al mismo shape.
-      // Simulo un refresh:
-      await new Promise((r) => setTimeout(r, 700));
-      setRates((prev) =>
-        prev.map((r) => ({
-          ...r,
-          price: (
-            parseFloat(r.price) *
-            (1 + (Math.random() - 0.5) / 50)
-          ).toFixed(2),
-        }))
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    // si quisiéramos traer data al montar, hacerlo aquí
-  }, []);
+  const { fetchData, loading } = useCurrencies();
 
   return (
     <div className="bg-home-gradient min-h-screen text-white">
       <Header />
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <ExchangeHero onRefresh={refreshRates} loading={loading} />
+        <ExchangeHero onRefresh={fetchData} loading={loading} />
+        <CurrencyTable />
         <RatesGrid rates={rates} />
       </main>
-
       <WhatsAppButton />
     </div>
+  );
+}
+
+// 🚀 App principal: envuelve todo con el Provider
+export default function App() {
+  return (
+    <CurrencyProvider>
+      <AppContent />
+    </CurrencyProvider>
   );
 }
