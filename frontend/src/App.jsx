@@ -35,7 +35,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-[#060224] via-[#0B0B73] to-[#03498F] min-h-screen text-white">
+    <div className="bg-home-gradient min-h-screen text-white">
       <Header />
       <main className="max-w-5xl mx-auto px-4 py-8">
         <ExchangeHero onRefresh={refreshRates} loading={loading} />
