@@ -7,7 +7,7 @@ export default {
         "aqua-gradient":
           "linear-gradient(to right, #03E2FF, #0FC1D9 75%, #0AB1C7 100%)",
         "home-gradient":
-          "linear-gradient(to right, #021536, #0C2E69 35%, #10489C 85%, #10499E 100%)",
+          "linear-gradient(to right, #0A1635, #0E1E45 75%, #12285B 100%)",
       },
       colors: {
         primary: "#07C7E0",
