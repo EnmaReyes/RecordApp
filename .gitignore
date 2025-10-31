@@ -1,0 +1,81 @@
+# ==========================================
+# 🌐 PROYECTO FULLSTACK: FRONTEND + BACKEND
+# ==========================================
+
+# 🧱 IGNORAR BACKEND EN LA RAMA FRONTEND
+# (en la rama backend podés quitar o comentar esta línea)
+# ------------------------------------------
+/backend/
+
+
+# =======================
+# ⚙️ DEPENDENCIAS
+# =======================
+node_modules/
+**/node_modules/
+
+
+# =======================
+# 🧰 LOGS Y DEBUG
+# =======================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+# =======================
+# 🧪 AMBIENTES Y CONFIG
+# =======================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+
+# =======================
+# 🧱 BUILD Y DIST
+# =======================
+dist/
+dist-ssr/
+build/
+.cache/
+.tmp/
+
+
+# =======================
+# 🧩 ARCHIVOS TEMPORALES
+# =======================
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+*.tar.gz
+*.zip
+
+
+# =======================
+# 💻 EDITORES Y SISTEMAS
+# =======================
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+# =======================
+# 📦 OTROS
+# =======================
+*.local
+coverage/
+typings/
