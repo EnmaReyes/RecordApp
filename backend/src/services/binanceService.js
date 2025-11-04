@@ -26,7 +26,7 @@ const minAmount = {
   VES: 5000,
   CLP: 40000,
   ARS: 50000,
-  UYU: 1000,
+  UYU: 1200,
   EUR: 100,
   USD: 100,
   ECU: 100,
@@ -87,15 +87,29 @@ export async function fetchP2PPrices(fiat, tradeType = "SELL", minOverride) {
 // ✅ Obtener todas las monedas (con delay entre cada una)
 export async function fetchAllCurrencies() {
   const results = [];
+
   for (const fiat of fiatList) {
     const sell = await fetchP2PPrices(fiat, "SELL");
     await delay(700);
     const buy = await fetchP2PPrices(fiat, "BUY");
     await delay(700);
 
-    if (sell) results.push(sell);
-    if (buy) results.push(buy);
+    // Combinar ambos resultados si existen
+    if (sell || buy) {
+      results.push({
+        fiat,
+        sellPrice: sell?.price || null,
+        buyPrice: buy?.price || null,
+        sellMin: sell?.minSingleTransAmount || null,
+        buyMin: buy?.minSingleTransAmount || null,
+        sellMax: sell?.maxSingleTransAmount || null,
+        buyMax: buy?.maxSingleTransAmount || null,
+        sellPaymentMethods: sell?.paymentMethods || [],
+        buyPaymentMethods: buy?.paymentMethods || [],
+      });
+    }
   }
+
   return results;
 }
 
