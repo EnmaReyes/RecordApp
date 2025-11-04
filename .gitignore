@@ -1,81 +1,18 @@
-# ==========================================
-# 🌐 PROYECTO FULLSTACK: FRONTEND + BACKEND
-# ==========================================
-
-# 🧱 IGNORAR BACKEND EN LA RAMA FRONTEND
-# (en la rama backend podés quitar o comentar esta línea)
-# ------------------------------------------
-/backend/
-
-
-# =======================
-# ⚙️ DEPENDENCIAS
-# =======================
+# Ignorar dependencias
 node_modules/
-**/node_modules/
+*/node_modules/
 
-
-# =======================
-# 🧰 LOGS Y DEBUG
-# =======================
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-
-# =======================
-# 🧪 AMBIENTES Y CONFIG
-# =======================
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-
-# =======================
-# 🧱 BUILD Y DIST
-# =======================
+# Ignorar build outputs
 dist/
 dist-ssr/
-build/
-.cache/
-.tmp/
+*.local
 
-
-# =======================
-# 🧩 ARCHIVOS TEMPORALES
-# =======================
-*.pid
-*.seed
-*.pid.lock
-*.tgz
-*.tar.gz
-*.zip
-
-
-# =======================
-# 💻 EDITORES Y SISTEMAS
-# =======================
+# Editor y sistema
 .vscode/*
-!.vscode/extensions.json
 .idea/
 .DS_Store
-Thumbs.db
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*.log
 
-
-# =======================
-# 📦 OTROS
-# =======================
-*.local
-coverage/
-typings/
+# Ignorar lo que no corresponde a la rama actual
+/backend/
+# o /frontend/ (según la rama en la que estés)
