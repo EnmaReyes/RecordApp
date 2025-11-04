@@ -12,7 +12,3 @@ dist-ssr/
 .idea/
 .DS_Store
 *.log
-
-# Ignorar lo que no corresponde a la rama actual
-/backend/
-# o /frontend/ (según la rama en la que estés)
