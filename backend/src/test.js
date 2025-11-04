@@ -15,7 +15,6 @@ const fiatList = [
   "EUR",
   "USD",
   "BRL",
-  "ECU",
 ];
 
 // ✅ Mínimos por moneda
@@ -29,7 +28,6 @@ const minAmount = {
   UYU: 1000,
   EUR: 100,
   USD: 100,
-  ECU: 100,
   BRL: 300,
 };
 

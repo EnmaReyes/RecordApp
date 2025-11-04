@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 3000;
 
 sequelize.sync({ alter: true }).then(() => {
   console.log("🟢 DB sincronizada");
-  app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
+  app.listen(PORT, () =>
+    console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
+  );
 });
-

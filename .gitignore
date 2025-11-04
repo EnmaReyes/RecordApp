@@ -1,0 +1,14 @@
+# Ignorar dependencias
+node_modules/
+*/node_modules/
+
+# Ignorar build outputs
+dist/
+dist-ssr/
+*.local
+
+# Editor y sistema
+.vscode/*
+.idea/
+.DS_Store
+*.log
