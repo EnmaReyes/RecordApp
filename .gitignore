@@ -14,5 +14,5 @@ dist-ssr/
 *.log
 
 # Ignorar lo que no corresponde a la rama actual
-/frontend/
+/backend/
 # o /frontend/ (según la rama en la que estés)
