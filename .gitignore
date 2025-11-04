@@ -1,2 +1,18 @@
+# Ignorar dependencias
+node_modules/
+*/node_modules/
+
+# Ignorar build outputs
+dist/
+dist-ssr/
+*.local
+
+# Editor y sistema
+.vscode/*
+.idea/
+.DS_Store
+*.log
+
+# Ignorar lo que no corresponde a la rama actual
 /frontend/
-/node_modules
+# o /frontend/ (según la rama en la que estés)
