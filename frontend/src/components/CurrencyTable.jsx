@@ -1,11 +1,34 @@
 import React from "react";
 import { FaClock } from "react-icons/fa";
 import { useCurrencies } from "../context/CurrencyProvider";
+import ReactCountryFlag from "react-country-flag";
 
 const CurrencyTable = () => {
   const { currencies, loading, lastUpdated } = useCurrencies();
-
-  console.log(currencies);
+  const fiatNames = {
+    USD: "US Dollar",
+    EUR: "Euro",
+    CLP: "Pesos chilenos",
+    COP: "Pesos colombianos",
+    ARS: "Pesos argentinos",
+    VES: "Bolívares venezolanos",
+    MXN: "Pesos mexicanos",
+    UYU: "Pesos uruguayos",
+    BRL: "Reales brasileños",
+    PEN: "Soles peruanos",
+  };
+  const fiatFlags = {
+    USD: "US",
+    EUR: "EU",
+    CLP: "CL",
+    COP: "CO",
+    ARS: "AR",
+    VES: "VE",
+    MXN: "MX",
+    UYU: "UY",
+    BRL: "BR",
+    PEN: "PE",
+  };
 
   if (loading && currencies.length === 0) {
     return (
@@ -16,8 +39,8 @@ const CurrencyTable = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white/5 text-white">
-      <div className="w-[90%] md:w-4/5 lg:w-3/4 xl:w-2/3 rounded-2xl backdrop-blur-lg p-6 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-white/5 text-white rounded-3xl shadow-xl my-10 border border-white/10 p-4  ">
+      <div className="w-[90%] md:w-4/5 lg:w-3/4 xl:w-[100%] rounded-3xl backdrop-blur-lg p-6 ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">Currency Prices</h2>
           <div className="flex items-center text-sm text-gray-300">
@@ -43,15 +66,24 @@ const CurrencyTable = () => {
                   className="bg-white/5 hover:bg-white/10 transition rounded-lg"
                 >
                   <td className="py-3 px-4">
-                    <div>
-                      <div className="font-bold">{cur.fiat}</div>
-                      <div className="text-gray-300 text-sm">{cur.name}</div>
+                    <div className="flex items-center">
+                      <ReactCountryFlag
+                        countryCode={fiatFlags[cur.fiat]}
+                        svg
+                        style={{ fontSize: "2em", marginRight: "0.5em" }}
+                      />
+                      <div>
+                        <div className="font-bold">{cur.fiat}</div>
+                        <div className="text-gray-300 text-sm">
+                          {fiatNames[cur.fiat]}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className="py-3 px-4 font-mono">{cur.buyPrice}</td>
                   <td className="py-3 px-4 font-mono">{cur.sellPrice}</td>
                   <td className="py-3 px-4 font-semibold text-cyan-400">
-                    {cur.spread.toFixed(2)}%
+                    {cur.spread?.toFixed(2)}%
                   </td>
                 </tr>
               ))}

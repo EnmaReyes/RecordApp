@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { calcSpread } from "../utils/calcSpread.js";
 
 const CurrencyContext = createContext();
 
@@ -16,9 +17,15 @@ export const CurrencyProvider = ({ children }) => {
     setLoading(true);
     try {
       // 👉 Cambia esta URL por la de tu API real
-      const response = await axios.get("http://localhost:3000/prices/");
+      const response = await axios.get("http://localhost:3000/prices/", {
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const data = (response.data.data || response.data).map((item) => ({
+        ...item,
+        spread: calcSpread(item.sellPrice, item.buyPrice),
+      }));
 
-      setCurrencies(response.data);
+      setCurrencies(data);
 
       const now = new Date();
       const formatted = now.toLocaleTimeString("en-US", {
