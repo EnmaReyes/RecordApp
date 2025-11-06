@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import RatesGrid from "./components/RatesGrid";
 import Header from "./components/Header";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ExchangeHero from "./components/ExchangeHero";
-import sampleData from "./data/SampleData.jsx";
 import CurrencyTable from "./components/CurrencyTable.jsx";
+import ExchangeBox from "./components/ExchangeBox.jsx";
 import {
   CurrencyProvider,
   useCurrencies,
@@ -12,7 +11,6 @@ import {
 
 // 🧠 Este componente sí puede usar el contexto
 function AppContent() {
-  const [rates, setRates] = useState(sampleData);
   const { fetchData, loading } = useCurrencies();
 
   return (
@@ -21,7 +19,7 @@ function AppContent() {
       <main className="max-w-5xl mx-auto px-4 py-8">
         <ExchangeHero onRefresh={fetchData} loading={loading} />
         <CurrencyTable />
-        <RatesGrid rates={rates} />
+        <ExchangeBox />
       </main>
       <WhatsAppButton />
     </div>
