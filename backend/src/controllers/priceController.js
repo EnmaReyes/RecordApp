@@ -1,6 +1,6 @@
 import PricesByFiat from "../models/Price.js";
 import {
-  fetchP2PPrices,
+  fetchP2PData,
   fetchAllCurrencies,
 } from "../services/binanceService.js";
 
@@ -8,27 +8,34 @@ export async function getPriceByFiat(req, res) {
   const { fiat } = req.params;
 
   try {
-    const sell = await fetchP2PPrices(fiat, "SELL");
-    const buy = await fetchP2PPrices(fiat, "BUY");
+    // 🔹 Obtenemos datos organizados desde fetchP2PData()
+    const data = await fetchP2PData(fiat);
 
-    const data = {
+    if (!data || (!data.sell && !data.buy)) {
+      return res.status(404).json({
+        message: `No se encontraron datos para ${fiat}.`,
+      });
+    }
+
+    // 🔹 Armamos el objeto para la DB
+    const record = {
       fiat,
-      sellPrice: sell?.price || null,
-      buyPrice: buy?.price || null,
-      sellMin: sell?.minSingleTransAmount || null,
-      buyMin: buy?.minSingleTransAmount || null,
-      sellMax: sell?.maxSingleTransAmount || null,
-      buyMax: buy?.maxSingleTransAmount || null,
-      sellPaymentMethods: sell?.paymentMethods || [],
-      buyPaymentMethods: buy?.paymentMethods || [],
+      sellPrice: data.sell?.price || null,
+      buyPrice: data.buy?.price || null,
+      sellMin: data.sell?.min || null,
+      buyMin: data.buy?.min || null,
+      sellMax: data.sell?.max || null,
+      buyMax: data.buy?.max || null,
+      sellPaymentMethods: data.sell?.methods || [],
+      buyPaymentMethods: data.buy?.methods || [],
     };
 
-    // ✅ Actualiza o crea si no existe
-    await PricesByFiat.upsert(data);
+    // 🔹 Upsert (crea o actualiza)
+    await PricesByFiat.upsert(record);
 
     res.json({
-      message: `Precio de ${fiat} actualizado correctamente.`,
-      data,
+      message: `✅ ${fiat} actualizado correctamente.`,
+      data: record,
     });
   } catch (error) {
     console.error(`❌ Error al actualizar ${fiat}:`, error);
