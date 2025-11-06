@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors"; // 👈 importa CORS
 import sequelize from "./config/db.js";
-import priceRoutes from "./routes/prices.js";
+import priceRoutes from "./routes/routesPrices.js";
 
 dotenv.config();
 const app = express();

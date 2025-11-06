@@ -21,7 +21,7 @@ const minAmount = {
   PEN: 200,
   COP: 200000,
   VES: 5000,
-  CLP: 40000,
+  CLP: 20000,
   ARS: 50000,
   UYU: 1000,
   EUR: 100,
@@ -34,13 +34,7 @@ const paymentFilters = {
   EUR: ["SEPA", "Transferencia Bancaria", "BBVA", "Santander"],
   PEN: ["Yape", "Plin", "BCP"],
   COP: ["Nequi", "Daviplata", "Bancolombia"],
-  CLP: [
-    "Banco de Chile",
-    "Mercado Pago",
-    "Banco Estado",
-    "Transbank",
-    "Santander",
-  ],
+  CLP: [],
   VES: ["Mercantil", "Banesco", "pago móvil"],
   UYU: [],
   ARS: [],
@@ -77,7 +71,7 @@ export async function fetchP2PData(fiat, minOverride) {
   const payTypes = paymentFilters[fiat] || [];
 
   const makeRequest = async (tradeType) => {
-    const response = await axios.post(API_URL, {
+    const params = {
       asset: "USDT",
       fiat,
       tradeType,
@@ -87,10 +81,19 @@ export async function fetchP2PData(fiat, minOverride) {
       payTypes,
       publisherType: "merchant",
       transAmount: minAmountToUse.toString(),
-    });
+    };
 
-    const data = response.data.data;
-    
+    let response = await axios.post(API_URL, params);
+    let data = response.data.data;
+
+    // 🔁 Si no encontró nada, probamos sin publisherType ni filtros
+    if (!data || data.length === 0) {
+      console.warn(`⚠️ Reintentando ${fiat} sin filtros...`);
+      const fallbackParams = { ...params, publisherType: null, payTypes: [] };
+      response = await axios.post(API_URL, fallbackParams);
+      data = response.data.data;
+    }
+
     if (!data || !Array.isArray(data)) return [];
 
     return data.filter(
