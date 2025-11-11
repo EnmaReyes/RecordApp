@@ -46,7 +46,7 @@ const ExchangeBox = () => {
                   sellPrice={pair.sellPrice}
                   baseBuy={pair.baseBuy}
                   baseSell={pair.baseSell}
-                  initialMargin={10}
+                  initialMargin={9}
                 />
               ))}
           </div>

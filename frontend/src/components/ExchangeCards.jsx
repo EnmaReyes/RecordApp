@@ -30,23 +30,29 @@ export default function ExchangeCard({
   }, [buyPrice, sellPrice, baseBuy, baseSell, margin, from, to]);
 
   return (
-    <div className="bg-gradient-to-b from-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-700 w-[260px]">
+    <div className="bg-white/5 text-white p-5 rounded-2xl shadow-xl border border-slate-700 w-[260px] text-center">
       <div className="flex items-center justify-center gap-2 text-sm text-blue-300 mb-2">
         <span>{from}</span>
         <span>→</span>
         <span>{to}</span>
       </div>
 
-      <h2 className="text-xl font-bold text-cyan-400 text-center mb-1">
-        {formatRate(rate, 6)}
-      </h2>
-      <p className="text-center text-sm text-slate-400 mb-4">
-        1 {from} = {formatRate(rate, 6)} {to}
-      </p>
+      <div className="flex flex-col justify-center text-center bg-cyan-700/55 p-2 rounded-lg gap-0.5 mb-2">
+        <h2 className="text-2xl font-bold text-cyan-400 text-center mb-1">
+          {formatRate(rate, 4)}
+        </h2>
+        <p className="text-center text-sm text-white/85">
+          1 {from} = {formatRate(rate, 4)} {to}
+        </p>
+      </div>
 
-      <div className="text-xs text-slate-400 mb-4">
-        <p>Buy: {formatRate(buyPrice, 4)}</p>
-        <p>Sell: {formatRate(baseSell, 4)}</p>
+      <div className="text-xs text-slate-400 border border-slate-700 p-2 rounded-lg mb-4">
+        <p>
+          {from} Buy: {formatRate(buyPrice, 2)}
+        </p>
+        <p>
+          {to} Sell: {formatRate(baseSell, 2)}
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -60,7 +66,7 @@ export default function ExchangeCard({
           onChange={(e) => setMargin(parseFloat(e.target.value))}
           className="w-full accent-cyan-400 cursor-pointer"
         />
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <span className="text-sm">{margin.toFixed(1)} %</span>
         </div>
       </div>
