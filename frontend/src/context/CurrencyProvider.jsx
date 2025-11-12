@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { calcSpread } from "../utils/calcSpread.js";
 
-export default function useCurrencies() {
+const CurrencyContext = createContext();
+
+// Hook personalizado
+export const useCurrencies = () => useContext(CurrencyContext);
+
+export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState("");
 
   // ⚙️ Actualiza la base desde la API externa
   const updateFromApi = async () => {
@@ -57,9 +63,8 @@ export default function useCurrencies() {
     }
   };
   useEffect(() => {
-    fetchData();
+    fetchFromDB();
   }, []);
-
   return (
     <CurrencyContext.Provider
       value={{ currencies, loading, lastUpdated, fetchData }}
@@ -67,4 +72,4 @@ export default function useCurrencies() {
       {children}
     </CurrencyContext.Provider>
   );
-}
+};

@@ -39,6 +39,7 @@ export default function ExchangeHero({ onRefresh, loading }) {
           <button
             className="inline-flex items-center gap-2 px-5 py-4 rounded-2xl bg-transparent border-2 border-primary text-primary text-lg hover:opacity-95 shadow"
             disabled={loading}
+            
           >
             Cotizar Ahora
           </button>

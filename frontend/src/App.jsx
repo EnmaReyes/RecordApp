@@ -16,7 +16,7 @@ function AppContent() {
   return (
     <div className="bg-home-gradient min-h-screen text-white">
       <Header />
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="flex flex-col justify-center items-center mx-auto px-4 py-8">
         <ExchangeHero onRefresh={fetchData} loading={loading} />
         <CurrencyTable />
         <ExchangeBox />
