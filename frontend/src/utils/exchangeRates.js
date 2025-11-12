@@ -12,7 +12,7 @@ export function calculateCOPtoVES(buyPrice, sellPriceBase, margin = 0.1) {
   return result * (1 + margin);
 }
 
-export function formatRate(rate, decimals = 6) {
+export function formatRate(rate, decimals = 4) {
   if (rate === null || isNaN(rate)) return "-";
   return rate.toFixed(decimals);
 }
