@@ -2,8 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Puedes poner variables CSS para colores de la marca aquí */
-:root{
+/* Variables de marca */
+:root {
   --brand-1: #0f766e;
   --brand-2: #064e3b;
+}
+
+/* === Animación personalizada === */
+@layer utilities {
+  @keyframes border-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-border-spin {
+    animation: border-spin 3s linear infinite;
+  }
+
+  .card-wrapper {
+    @apply relative rounded-2xl overflow-hidden;
+  }
+
+  .card-wrapper::before {
+    content: "";
+    background: conic-gradient(
+      rgba(6, 207, 238, 0.5) 0deg,
+      rgba(3, 150, 173, 0.5) 120deg,
+      transparent 150deg
+    );
+  @apply absolute h-[160%] w-[160%] left-[-30%] top-[-30%] rounded-3xl animate-border-spin;
+  }
+
+  .card-content {
+    @apply relative w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1.5px] bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl ;
+  }
 }

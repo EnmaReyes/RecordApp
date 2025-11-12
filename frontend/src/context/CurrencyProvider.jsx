@@ -12,40 +12,59 @@ export const CurrencyProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("");
 
-  // 🔁 Función que trae los datos del backend
-  const fetchData = async () => {
-    setLoading(true);
+  // ⚙️ Actualiza la base desde la API externa
+  const updateFromApi = async () => {
     try {
-      // 👉 Cambia esta URL por la de tu API real
+      await axios.get("http://localhost:3000/prices/update/", {
+        headers: { "Cache-Control": "no-cache" },
+      });
+    } catch (error) {
+      console.error("❌ Error updating currencies from API:", error);
+    }
+  };
+
+  // 💾 Obtiene los datos ya guardados en la DB
+  const fetchFromDB = async () => {
+    try {
       const response = await axios.get("http://localhost:3000/prices/", {
         headers: { "Cache-Control": "no-cache" },
       });
-      const data = (response.data.data || response.data).map((item) => ({
+
+      const rawData = response.data.data || response.data;
+
+      const formattedData = rawData.map((item) => ({
         ...item,
         spread: calcSpread(item.sellPrice, item.buyPrice),
       }));
 
-      setCurrencies(data);
+      setCurrencies(formattedData);
 
       const now = new Date();
-      const formatted = now.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      });
-      setLastUpdated(formatted);
+      setLastUpdated(
+        now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
     } catch (error) {
-      console.error("Error fetching currencies:", error);
+      console.error("❌ Error fetching currencies from DB:", error);
+    }
+  };
+
+  // 🔁 Carga completa: actualiza + trae
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      await updateFromApi();
+      await fetchFromDB();
     } finally {
       setLoading(false);
     }
   };
-
-  // 🔹 Cargar datos solo una vez al iniciar
   useEffect(() => {
-    fetchData();
+    fetchFromDB();
   }, []);
-
   return (
     <CurrencyContext.Provider
       value={{ currencies, loading, lastUpdated, fetchData }}

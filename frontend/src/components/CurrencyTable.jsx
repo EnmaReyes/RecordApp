@@ -2,9 +2,11 @@ import React from "react";
 import { FaClock } from "react-icons/fa";
 import { useCurrencies } from "../context/CurrencyProvider";
 import ReactCountryFlag from "react-country-flag";
+import "../index.css";
 
 const CurrencyTable = () => {
   const { currencies, loading, lastUpdated } = useCurrencies();
+  
   const fiatNames = {
     USD: "US Dollar",
     EUR: "Euro",
@@ -39,10 +41,10 @@ const CurrencyTable = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white/5 text-white rounded-3xl shadow-xl my-10 border border-white/10 p-4  ">
-      <div className="w-[90%] md:w-4/5 lg:w-3/4 xl:w-[100%] rounded-3xl backdrop-blur-lg p-6 ">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">Currency Prices</h2>
+    <div className="card-wrapper min-h-screen w-[90%] flex items-center justify-center text-white my-10 ">
+      <div className="w-[80%] p-6 card-content">
+        <div className="flex justify-between items-center mb-6 ">
+          <h2 className="text-3xl font-bold">PRECIOS</h2>
           <div className="flex items-center text-sm text-gray-300">
             <FaClock className="mr-2" />
             <span>Última actualización: {lastUpdated}</span>

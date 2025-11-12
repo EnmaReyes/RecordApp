@@ -1,10 +1,10 @@
 import React from "react";
-
+import "../App.css";
 export default function Header() {
   return (
     <header className="bg-transparent shadow-sm">
       <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 logo">
           <div className="w-10 h-10 rounded-lg bg-aqua-gradient flex items-center justify-center text-dark font-bold text-lg shadow-lg shadow-cyan-500/30">
             R
           </div>
