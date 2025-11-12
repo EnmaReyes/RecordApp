@@ -4,27 +4,27 @@ const API_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search";
 
 // ✅ Lista de monedas
 const fiatList = [
+  "VES",
+  "COP",
   "MXN",
   "PEN",
-  "COP",
-  "VES",
   "CLP",
   "ARS",
-  "UYU",
   "EUR",
+  "UYU",
   "USD",
 ];
 
 // ✅ Monto mínimo personalizado por fiat
 const minAmount = {
+  VES: 5000,
+  COP: 200000,
   MXN: 1000,
   PEN: 200,
-  COP: 200000,
-  VES: 5000,
   CLP: 20000,
   ARS: 50000,
-  UYU: 1000,
   EUR: 100,
+  UYU: 1000,
   USD: 100,
 };
 
