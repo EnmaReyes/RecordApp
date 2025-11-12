@@ -1,5 +1,34 @@
 import axios from "axios";
 
+async function fetchBRLRate() {
+  try {
+    const url = "https://api.frankfurter.dev/v1/latest?base=USD&symbols=BRL";
+    const response = await axios.get(url);
+    const usdToBrl = response.data.rates.BRL;
+
+    // simulamos los precios P2P
+    const sellPrice = usdToBrl; // precio oficial
+    const buyPrice = usdToBrl * 1.005; // +0.5% para simular sobreprecio mercado libre
+
+    return {
+      fiat: "BRL",
+      sell: {
+        price: parseFloat(sellPrice.toFixed(4)),
+        methods: ["Banco Central do Brasil"],
+        advertiser: "Frankfurter API",
+      },
+      buy: {
+        price: parseFloat(buyPrice.toFixed(4)),
+        methods: ["Banco Central do Brasil"],
+        advertiser: "Frankfurter API",
+      },
+    };
+  } catch (err) {
+    console.error("❌ Error al obtener tasa BRL:", err.message);
+    return { fiat: "BRL", sell: null, buy: null };
+  }
+}
+
 const API_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search";
 
 // ✅ Lista de monedas
@@ -11,6 +40,7 @@ const fiatList = [
   "CLP",
   "ARS",
   "EUR",
+  "BRL",
   "UYU",
   "USD",
 ];
@@ -30,15 +60,15 @@ const minAmount = {
 
 // ✅ Métodos de pago personalizados por fiat
 const paymentFilters = {
-  USD: ["Zelle", "Banco Pichincha", "Produbanco", "Banco Guayaquil"],
-  EUR: ["SEPA", "Transferencia Bancaria", "BBVA", "Santander"],
-  PEN: ["Yape", "Plin", "BCP"],
-  COP: ["Nequi", "Daviplata", "Bancolombia"],
-  CLP: [],
   VES: ["Mercantil", "Banesco", "pago móvil"],
-  UYU: [],
-  ARS: [],
+  COP: ["Nequi", "Daviplata", "Bancolombia"],
   MXN: [],
+  PEN: ["Yape", "Plin", "BCP"],
+  CLP: [],
+  ARS: [],
+  EUR: ["SEPA", "Transferencia Bancaria", "BBVA", "Santander"],
+  UYU: [],
+  USD: ["Zelle", "Banco Pichincha", "Produbanco", "Banco Guayaquil"],
 };
 
 // 🔧 Delay entre peticiones
@@ -147,8 +177,13 @@ export async function fetchAllCurrencies() {
   for (const fiat of fiatList) {
     console.log(`\n🔍 Consultando ${fiat}...`);
 
-    const data = await fetchP2PData(fiat);
-    await delay(700); // delay ligero para no saturar el endpoint
+    let data;
+    if (fiat === "BRL") {
+      data = await fetchBRLRate(); // usamos la API de Frankfurter
+    } else {
+      data = await fetchP2PData(fiat);
+      await delay(700); // delay para no saturar Binance
+    }
 
     if (!data.sell && !data.buy) {
       console.warn(`⚠️ Sin resultados para ${fiat}`);
@@ -159,12 +194,10 @@ export async function fetchAllCurrencies() {
       fiat,
       buyPrice: data.buy ? data.buy.price : null,
       sellPrice: data.sell ? data.sell.price : null,
-      buyMin: data.buy ? data.buy.min : null,
-      sellMin: data.sell ? data.sell.min : null,
-      buyMax: data.buy ? data.buy.max : null,
-      sellMax: data.sell ? data.sell.max : null,
       buyMethods: data.buy ? data.buy.methods : [],
       sellMethods: data.sell ? data.sell.methods : [],
+      buyAdvertiser: data.buy ? data.buy.advertiser : null,
+      sellAdvertiser: data.sell ? data.sell.advertiser : null,
     });
   }
 
