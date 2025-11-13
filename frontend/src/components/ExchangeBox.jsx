@@ -52,7 +52,7 @@ const ExchangeBox = () => {
   }
 
   return (
-    <div id="ExchangeBox" className="flex flex-col justify-center gap-5 w-max">
+    <div id="tasas" className="flex flex-col justify-center gap-5 w-max">
       {currencies.map((baseFiat) => (
         <div key={baseFiat.id}>
           <div className="flex items-center justify-center w-full my-6">
