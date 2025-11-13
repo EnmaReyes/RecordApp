@@ -15,7 +15,7 @@ export default function ExchangeHero({ onRefresh, loading }) {
           </p>
         </div>
 
-        <div className="flex gap-3 items-center font-bold">
+        <div className="flex justify-center items-center font-bold w-full">
           <button
             onClick={onRefresh}
             disabled={loading}

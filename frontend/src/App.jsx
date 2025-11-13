@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Header from "./components/Header";
-import WhatsAppButton from "./components/WhatsAppButton";
 import ExchangeHero from "./components/ExchangeHero";
 import CurrencyTable from "./components/CurrencyTable.jsx";
 import ExchangeBox from "./components/ExchangeBox.jsx";
@@ -9,7 +8,6 @@ import {
   useCurrencies,
 } from "./context/CurrencyProvider.jsx";
 
-// 🧠 Este componente sí puede usar el contexto
 function AppContent() {
   const { fetchData, loading } = useCurrencies();
 
@@ -21,12 +19,10 @@ function AppContent() {
         <CurrencyTable />
         <ExchangeBox />
       </main>
-      <WhatsAppButton />
     </div>
   );
 }
 
-// 🚀 App principal: envuelve todo con el Provider
 export default function App() {
   return (
     <CurrencyProvider>
