@@ -12,10 +12,13 @@ export const CurrencyProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("");
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const urlDB = import.meta.env.VITE_URLDB;
+
   // ⚙️ Actualiza la base desde la API externa
   const updateFromApi = async () => {
     try {
-      await axios.get("http://localhost:3000/prices/update/", {
+      await axios.get(apiUrl, {
         headers: { "Cache-Control": "no-cache" },
       });
     } catch (error) {
@@ -26,7 +29,7 @@ export const CurrencyProvider = ({ children }) => {
   // 💾 Obtiene los datos ya guardados en la DB
   const fetchFromDB = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/prices/", {
+      const response = await axios.get(urlDB, {
         headers: { "Cache-Control": "no-cache" },
       });
 
