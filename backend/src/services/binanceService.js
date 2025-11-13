@@ -1,5 +1,6 @@
 import axios from "axios";
-
+import dotenv from "dotenv";
+dotenv.config();
 async function fetchBRLRate() {
   try {
     const url = "https://api.frankfurter.dev/v1/latest?base=USD&symbols=BRL";
@@ -29,7 +30,7 @@ async function fetchBRLRate() {
   }
 }
 
-const API_URL = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search";
+const API_URL = process.env.API_URL;
 
 // ✅ Lista de monedas
 const fiatList = [
