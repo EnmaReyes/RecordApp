@@ -1,5 +1,3 @@
-// src/utils/exchangeRates.js
-
 export function calculateGeneral(sellPrice, buyPriceBase, margin = 0.1) {
   if (!sellPrice || !buyPriceBase) return null;
   const result = sellPrice / buyPriceBase;

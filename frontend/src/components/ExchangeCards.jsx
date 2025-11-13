@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   calculateGeneral,
   calculateCOPtoVES,
@@ -14,6 +14,7 @@ export default function ExchangeCard({
   baseSell,
   type = 1,
   initialMargin = 8,
+  onRateCalculated,
 }) {
   const [margin, setMargin] = useState(initialMargin);
 
@@ -29,6 +30,11 @@ export default function ExchangeCard({
     return calculateGeneral(baseSell, buyPrice, marginDecimal);
   }, [buyPrice, sellPrice, baseBuy, baseSell, margin, from, to]);
 
+  useEffect(() => {
+    if (onRateCalculated && rate) {
+      onRateCalculated({ from, to, rate });
+    }
+  }, [rate, from, to, onRateCalculated]);
   return (
     <div className="bg-white/5 text-white p-5 rounded-2xl shadow-xl border border-slate-700 w-[260px] text-center">
       <div className="flex items-center justify-center gap-2 text-sm text-blue-300 mb-2">

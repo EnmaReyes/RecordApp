@@ -3,8 +3,6 @@ import axios from "axios";
 import { calcSpread } from "../utils/calcSpread.js";
 
 const CurrencyContext = createContext();
-
-// Hook personalizado
 export const useCurrencies = () => useContext(CurrencyContext);
 
 export const CurrencyProvider = ({ children }) => {
@@ -15,12 +13,21 @@ export const CurrencyProvider = ({ children }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const urlDB = import.meta.env.VITE_URLDB;
 
-  // ⚙️ Actualiza la base desde la API externa
+  // ⚙️ Llama a la API para actualizar las DB
   const updateFromApi = async () => {
     try {
       await axios.get(apiUrl, {
         headers: { "Cache-Control": "no-cache" },
       });
+
+      const now = new Date();
+      setLastUpdated(
+        now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
     } catch (error) {
       console.error("❌ Error updating currencies from API:", error);
     }
@@ -41,15 +48,6 @@ export const CurrencyProvider = ({ children }) => {
       }));
 
       setCurrencies(formattedData);
-
-      const now = new Date();
-      setLastUpdated(
-        now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-      );
     } catch (error) {
       console.error("❌ Error fetching currencies from DB:", error);
     }
