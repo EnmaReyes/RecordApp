@@ -41,7 +41,7 @@ const CurrencyTable = () => {
   }
 
   return (
-    <div className="card-wrapper min-h-screen w-[90%] flex items-center justify-center text-white my-10 ">
+    <div id="prices" className="card-wrapper min-h-screen w-[90%] flex items-center justify-center text-white my-10 ">
       <div className="w-[80%] p-6 card-content">
         <div className="flex justify-between items-center mb-6 ">
           <h2 className="text-3xl font-bold">PRECIOS</h2>
