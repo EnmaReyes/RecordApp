@@ -6,20 +6,19 @@ dotenv.config();
 let sequelize;
 
 if (process.env.NODE_ENV === "production") {
-  // 🟢 PRODUCCIÓN (Supabase)
+  // 🔵 PRODUCCIÓN — RENDER + SUPABASE
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",
-    protocol: "postgres",
-    logging: false,
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
+        rejectUnauthorized: false, // 🔥 IMPORTANTE
       },
     },
+    logging: false,
   });
 } else {
-  // 🟡 LOCAL (PGAdmin)
+  // 🟡 DESARROLLO LOCAL — PGADMIN
   sequelize = new Sequelize(
     process.env.POSTGRES_DATABASE,
     process.env.POSTGRES_USER,
@@ -33,4 +32,3 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export default sequelize;
-
