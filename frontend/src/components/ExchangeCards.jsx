@@ -43,7 +43,7 @@ export default function ExchangeCard({
         <span>{to}</span>
       </div>
 
-      <div className="flex flex-col justify-center text-center bg-cyan-700/55 p-2 rounded-lg gap-0.5 mb-2">
+      <div className="flex flex-col justify-center text-center bg-primary/30 p-2 rounded-lg gap-0.5 mb-2">
         <h2 className="text-2xl font-bold text-cyan-400 text-center mb-1">
           {formatRate(rate, 4)}
         </h2>
@@ -63,6 +63,9 @@ export default function ExchangeCard({
 
       <div className="space-y-2">
         <p className="text-xs text-slate-300">Profit Margin</p>
+        <div className="flex items-center justify-center">
+          <span className="text-sm">{margin.toFixed(1)} %</span>
+        </div>
         <input
           type="range"
           min="0"
@@ -72,8 +75,22 @@ export default function ExchangeCard({
           onChange={(e) => setMargin(parseFloat(e.target.value))}
           className="w-full accent-cyan-400 cursor-pointer"
         />
-        <div className="flex items-center justify-center">
-          <span className="text-sm">{margin.toFixed(1)} %</span>
+      </div>
+      <div className="space-y-2">
+        <div className="flex items-center justify-center gap-3">
+          <button
+            className="px-3 py-1 bg-primary/30 rounded text-white button"
+            onClick={() => setMargin((prev) => Math.max(0, prev - 0.5))}
+          >
+            -
+          </button>
+
+          <button
+            className="px-3 py-1 bg-primary/30 rounded text-white button"
+            onClick={() => setMargin((prev) => Math.min(20, prev + 0.5))}
+          >
+            +
+          </button>
         </div>
       </div>
     </div>
