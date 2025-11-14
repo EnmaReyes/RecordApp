@@ -1,12 +1,11 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 let sequelize;
 
-if (process.env.NODE_ENV === "production") {
-  // 🟢 PRODUCCIÓN (Supabase)
+if (process.env.DATABASE_URL) {
+  // 🌐 Producción (Render + Neon)
   sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: "postgres",
     protocol: "postgres",
@@ -14,12 +13,12 @@ if (process.env.NODE_ENV === "production") {
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       },
     },
   });
 } else {
-  // 🟡 LOCAL (PGAdmin)
+  // 💻 Desarrollo (pgAdmin local)
   sequelize = new Sequelize(
     process.env.POSTGRES_DATABASE,
     process.env.POSTGRES_USER,
@@ -33,4 +32,3 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export default sequelize;
-
