@@ -116,7 +116,7 @@ const ExchangeBox = () => {
                   sellPrice={pair.sellPrice}
                   baseBuy={pair.baseBuy}
                   baseSell={pair.baseSell}
-                  initialMargin={9}
+                  initialMargin={pair.from === "BRL" ? 7 : 10}
                   onRateCalculated={handleRateCalculated}
                 />
               ))}
