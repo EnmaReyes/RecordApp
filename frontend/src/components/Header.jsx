@@ -2,7 +2,7 @@ import React from "react";
 import "../App.css";
 export default function Header() {
   return (
-    <header className="bg-dark/45 shadow-sm fixed w-full z-10">
+    <header className="sticky top-0  bg-dark/45 shadow-sm w-full z-10">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3 logo">
           <a href="#inicio">

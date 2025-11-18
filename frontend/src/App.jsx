@@ -7,6 +7,7 @@ import {
   CurrencyProvider,
   useCurrencies,
 } from "./context/CurrencyProvider.jsx";
+import Filter from "./components/Filter.jsx";
 
 function AppContent() {
   const { fetchData, loading } = useCurrencies();
@@ -14,9 +15,13 @@ function AppContent() {
   return (
     <div className="bg-home-gradient min-h-screen text-white">
       <Header />
-      <main className="flex flex-col justify-center items-center mx-auto px-4 py-8">
+      <main className="flex flex-col justify-center items-center mx-auto px-4 py-8 ">
         <ExchangeHero onRefresh={fetchData} loading={loading} />
         <CurrencyTable />
+        <div className="sticky top-24 z-50 backdrop-blur-sm ">
+          <Filter />
+        </div>
+
         <ExchangeBox />
       </main>
     </div>
