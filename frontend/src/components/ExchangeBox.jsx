@@ -92,7 +92,10 @@ const ExchangeBox = () => {
                 svg
                 style={{ fontSize: "2em", marginRight: "0.3em" }}
               />
-              <div className="flex flex-col items-center text-white leading-tight">
+              <div
+                id={baseFiat.fiat}
+                className="flex flex-col items-center text-white leading-tight"
+              >
                 <span className="text-sm font-semibold">
                   Para {baseFiat.fiat}
                 </span>

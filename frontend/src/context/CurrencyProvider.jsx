@@ -8,7 +8,6 @@ export const useCurrencies = () => useContext(CurrencyContext);
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState("");
 
   const apiUrl = import.meta.env.VITE_API_URL;
   const urlDB = import.meta.env.VITE_URLDB;
@@ -19,22 +18,26 @@ export const CurrencyProvider = ({ children }) => {
       await axios.get(apiUrl, {
         headers: { "Cache-Control": "no-cache" },
       });
-
-      const now = new Date();
-      setLastUpdated(
-        now.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-      );
     } catch (error) {
       console.error("❌ Error updating currencies from API:", error);
     }
   };
 
   // 💾 Obtiene los datos ya guardados en la DB
+
   const fetchFromDB = async () => {
+    const fiatList = [
+      "VES",
+      "COP",
+      "MXN",
+      "PEN",
+      "CLP",
+      "ARS",
+      "EUR",
+      "BRL",
+      "UYU",
+      "USD",
+    ];
     try {
       const response = await axios.get(urlDB, {
         headers: { "Cache-Control": "no-cache" },
@@ -42,16 +45,26 @@ export const CurrencyProvider = ({ children }) => {
 
       const rawData = response.data.data || response.data;
 
-      const formattedData = rawData.map((item) => ({
-        ...item,
-        spread: calcSpread(item.sellPrice, item.buyPrice),
-      }));
+      const formattedData = rawData
+        .map((item) => ({
+          ...item,
+          spread: calcSpread(item.sellPrice, item.buyPrice),
+        }))
+        .sort((a, b) => {
+          return fiatList.indexOf(a.fiat) - fiatList.indexOf(b.fiat);
+        });
 
       setCurrencies(formattedData);
     } catch (error) {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
+
+  useEffect(() => {
+    setLoading(true);
+    fetchFromDB();
+    setLoading(false);
+  }, []);
 
   // 🔁 Carga completa: actualiza + trae
   const fetchData = async () => {
@@ -63,13 +76,9 @@ export const CurrencyProvider = ({ children }) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    fetchFromDB();
-  }, []);
+
   return (
-    <CurrencyContext.Provider
-      value={{ currencies, loading, lastUpdated, fetchData }}
-    >
+    <CurrencyContext.Provider value={{ currencies, loading, fetchData }}>
       {children}
     </CurrencyContext.Provider>
   );

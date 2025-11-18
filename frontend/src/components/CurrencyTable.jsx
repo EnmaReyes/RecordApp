@@ -5,8 +5,8 @@ import ReactCountryFlag from "react-country-flag";
 import "../index.css";
 
 const CurrencyTable = () => {
-  const { currencies, loading, lastUpdated } = useCurrencies();
-  
+  const { currencies, loading } = useCurrencies();
+
   const fiatNames = {
     USD: "US Dollar",
     EUR: "Euro",
@@ -31,23 +31,35 @@ const CurrencyTable = () => {
     BRL: "BR",
     PEN: "PE",
   };
+  const Update = new Date(currencies[0]?.updatedAt).toLocaleTimeString(
+    "en-US",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
 
   if (loading && currencies.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-transparent text-white">
+      <div className="min-h-screen w-full flex items-center justify-center bg-transparent text-white">
         <p className="text-lg animate-pulse">Cargando datos...</p>
       </div>
     );
   }
 
   return (
-    <div id="prices" className="card-wrapper min-h-screen w-[90%] flex items-center justify-center text-white my-10 ">
-      <div className="w-[80%] p-6 card-content">
+    <div
+      id="prices"
+      className="card-wrapper min-h-screen w-[98%] md:w-[90%] flex items-center justify-center text-white my-10"
+    >
+      <div className="w-[90%] md:w-[80%] p-4 md:p-6 card-content">
         <div className="flex justify-between items-center mb-6 ">
           <h2 className="text-3xl font-bold">PRECIOS</h2>
-          <div className="flex items-center text-sm text-gray-300">
+          <div className="flex items-center justify-center text-sm text-gray-300">
             <FaClock className="mr-2" />
-            <span>Última actualización: {lastUpdated}</span>
+            <span className="flex flex-col text-end ">
+              Última actualización<p className="font-bold">{Update}</p>
+            </span>
           </div>
         </div>
 
