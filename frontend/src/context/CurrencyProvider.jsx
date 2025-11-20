@@ -61,9 +61,13 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchFromDB();
-    setLoading(false);
+    const fetchDBData = async () => {
+      setLoading(true);
+      await fetchFromDB();
+      setLoading(false);
+    };
+
+    fetchDBData();
   }, []);
 
   // 🔁 Carga completa: actualiza + trae
