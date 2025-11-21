@@ -62,9 +62,11 @@ export const CurrencyProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchDBData = async () => {
-      setLoading(true);
-      await fetchFromDB();
-      setLoading(false);
+      try {
+        await fetchFromDB();
+      } catch (error) {
+        console.error("❌ Error fetching initial currencies from DB:", error);
+      }
     };
 
     fetchDBData();
