@@ -18,7 +18,7 @@ function AppContent() {
       <main className="flex flex-col justify-center items-center mx-auto px-4 py-8 ">
         <ExchangeHero onRefresh={fetchData} loading={loading} />
         <CurrencyTable />
-        <div className="sticky top-24 z-50 backdrop-blur-sm ">
+        <div className="sticky top-8 z-50">
           <Filter />
         </div>
 

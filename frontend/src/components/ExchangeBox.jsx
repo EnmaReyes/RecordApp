@@ -45,10 +45,9 @@ const ExchangeBox = () => {
     });
   };
 
-  if (loading) return <p className="text-center text-white">Loading...</p>;
-  if (!currencies || currencies.length === 0)
-    return <p>No currencies loaded</p>;
-
+  if (loading || currencies.length === 0)
+    return <p className="text-center text-white">Loading...</p>;
+  
   // 🔁 Generar todas las combinaciones posibles
   const allPairs = [];
   for (const dataFrom of currencies) {
