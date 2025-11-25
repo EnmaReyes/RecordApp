@@ -39,7 +39,7 @@ const CurrencyTable = () => {
     }
   );
 
-  if (loading && currencies.length === 0) {
+  if (loading || currencies.length === 0) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-transparent text-white">
         <p className="text-lg animate-pulse">Cargando datos...</p>
