@@ -12,6 +12,7 @@ export const CurrencyProvider = ({ children }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const urlDB = import.meta.env.VITE_URLDB;
 
+
   // ⚙️ Llama a la API para actualizar las DB
   const updateFromApi = async () => {
     try {
@@ -23,8 +24,57 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 💾 Obtiene los datos ya guardados en la DB
+  const updateOneFiatApi = async (fiat) => {
+    try {
+      await axios.get(`${apiUrl}?fiat=${fiat}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+    } catch (error) {
+      console.error(`❌ Error updating ${fiat} from API:`, error);
+    }
 
+    try {
+      const response = await axios.get(`${urlDB}/${fiat}`, {
+        headers: { "Cache-Control": "no-cache" },
+      });
+
+      const updated = response.data.data || response.data;
+
+      const spreadCurrency = {
+        ...updated,
+        spread: calcSpread(updated.sellPrice, updated.buyPrice),
+      };
+
+      // 3️⃣ Reemplaza SOLO ese fiat dentro del estado
+      setCurrencies((prev) => {
+        const replaced = prev.map((c) =>
+          c.fiat === fiat ? spreadCurrency : c
+        );
+
+        const fiatList = [
+          "VES",
+          "COP",
+          "MXN",
+          "PEN",
+          "CLP",
+          "ARS",
+          "EUR",
+          "BRL",
+          "UYU",
+          "USD",
+        ];
+
+        return replaced.sort(
+          (a, b) => fiatList.indexOf(a.fiat) - fiatList.indexOf(b.fiat)
+        );
+      });
+    } catch (error) {
+      console.error(`❌ Error fetching ${fiat} from DB:`, error);
+    }
+  };
+
+
+  // 💾 Obtiene los datos ya guardados en la DB
   const fetchFromDB = async () => {
     const fiatList = [
       "VES",
@@ -59,7 +109,7 @@ export const CurrencyProvider = ({ children }) => {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
-
+  // 🚀 Al montar, trae los datos de la DB
   useEffect(() => {
     const fetchDBData = async () => {
       try {
@@ -71,6 +121,7 @@ export const CurrencyProvider = ({ children }) => {
 
     fetchDBData();
   }, []);
+
 
   // 🔁 Carga completa: actualiza + trae
   const fetchData = async () => {
@@ -84,7 +135,7 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   return (
-    <CurrencyContext.Provider value={{ currencies, loading, fetchData }}>
+    <CurrencyContext.Provider value={{ currencies, loading, fetchData, updateOneFiatApi }}>
       {children}
     </CurrencyContext.Provider>
   );
