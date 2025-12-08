@@ -1,12 +1,13 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors"; // 👈 importa CORS
+import cors from "cors";
 import sequelize from "./config/db.js";
 import priceRoutes from "./routes/routesPrices.js";
 
 dotenv.config();
 const app = express();
 
+// CORS
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -15,14 +16,14 @@ app.use(
   })
 );
 
+// Middlewares
 app.use(express.json());
 app.use("/prices", priceRoutes);
 
-const PORT = process.env.PORT || 3000;
+// Sincronizar DB una sola vez
+sequelize
+  .sync({ alter: true })
+  .then(() => console.log("🟢 DB sincronizada"))
+  .catch((err) => console.error("❌ Error al sincronizar DB:", err));
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log("🟢 DB sincronizada");
-  app.listen(PORT, () =>
-    console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
-  );
-});
+export default app;
