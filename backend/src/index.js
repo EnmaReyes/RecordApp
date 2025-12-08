@@ -5,6 +5,7 @@ import sequelize from "./config/db.js";
 import priceRoutes from "./routes/routesPrices.js";
 
 dotenv.config();
+
 const app = express();
 
 // CORS
@@ -16,14 +17,28 @@ app.use(
   })
 );
 
-// Middlewares
 app.use(express.json());
 app.use("/prices", priceRoutes);
 
-// Sincronizar DB una sola vez
+// Probar conexión
 sequelize
-  .sync({ alter: true })
-  .then(() => console.log("🟢 DB sincronizada"))
-  .catch((err) => console.error("❌ Error al sincronizar DB:", err));
+  .authenticate()
+  .then(() => console.log("🟢 DB conectada"))
+  .catch((err) => console.error("❌ Error DB:", err.message));
 
+/*
+  ⭐ LOCAL MODE
+  Si NO estás en Vercel → levantar servidor normalmente
+*/
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor local corriendo en http://localhost:${PORT}`);
+  });
+}
+
+/*
+  ⭐ SERVERLESS MODE (Vercel)
+  Exportamos SIEMPRE la app para que Vercel la envuelva.
+*/
 export default app;
