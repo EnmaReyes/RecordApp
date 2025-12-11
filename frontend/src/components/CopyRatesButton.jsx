@@ -36,7 +36,7 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
         );
         const rate = rateObj?.rate ?? "N/A";
 
-        return `${pair.from} → ${pair.to} : ${rate}`;
+        return `${pair.from} → ${pair.to} : ${formatRate(rate, 4)}`;
       }),
     ].join("\n");
 
