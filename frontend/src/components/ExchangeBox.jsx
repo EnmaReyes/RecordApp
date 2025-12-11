@@ -5,6 +5,7 @@ import ReactCountryFlag from "react-country-flag";
 import WhatsAppButton from "./WhatsAppButton.jsx";
 import ModeSwitchNeo from "./FromSwitchTo.jsx";
 import NeonModeSwitchFlag from "./FromSwitchTo.jsx";
+import CopyRatesButton from "./CopyRatesButton.jsx";
 
 const ExchangeBox = () => {
   const { currencies, loading } = useCurrencies();
@@ -84,8 +85,8 @@ const ExchangeBox = () => {
   return (
     <div id="tasas" className="flex flex-col justify-center gap-5 w-max">
       {currencies.map((baseFiat) => (
-        <div key={baseFiat.id}>
-          <div className="flex flex-col items-center w-full mb-8">
+        <div key={baseFiat.id} id={baseFiat.fiat}>
+          <div className="flex md:flex-row flex-col justify-center items-center w-full md:mb-8 mb-4">
             <NeonModeSwitchFlag
               mode={mode}
               setMode={setMode}
@@ -93,6 +94,15 @@ const ExchangeBox = () => {
               fiatFlags={fiatFlags}
               fiatNames={fiatNames}
             />
+
+            <div className="md:absolute md:right-60 mt-2 md:mt-0">
+              <CopyRatesButton
+                baseFiat={baseFiat.fiat}
+                mode={mode}
+                allPairs={allPairs}
+                calculatedRates={calculatedRates}
+              />
+            </div>
           </div>
 
           {/* 🧩 GRID DE CARDS */}
