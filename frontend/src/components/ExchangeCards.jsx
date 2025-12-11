@@ -4,6 +4,7 @@ import {
   calculateCOPtoVES,
   formatRate,
 } from "../utils/exchangeRates";
+import { CopyRateButton } from "./CopyRatesButton";
 
 export default function ExchangeCard({
   from,
@@ -37,12 +38,15 @@ export default function ExchangeCard({
   }, [rate, from, to, onRateCalculated]);
   return (
     <div className="bg-white/5 text-white p-5 rounded-2xl shadow-xl border border-slate-700 w-[260px] text-center">
-      <div className="flex items-center justify-center gap-2 text-sm text-blue-300 mb-2">
+      <div className="flex items-center justify-center gap-2 text-sm text-blue-300 mb-2 relative">
         <span>{from}</span>
         <span>→</span>
         <span>{to}</span>
-      </div>
 
+        <div className="absolute right-[-0.5rem] bottom-2">
+          <CopyRateButton from={from} to={to} rateValue={rate} />
+        </div>
+      </div>
       <div className="flex flex-col justify-center text-center bg-primary/30 p-2 rounded-lg gap-0.5 mb-2">
         <h2 className="text-2xl font-bold text-cyan-400 text-center mb-1">
           {formatRate(rate, 4)}

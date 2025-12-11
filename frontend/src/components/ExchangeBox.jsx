@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useCurrencies } from "../context/CurrencyProvider.jsx";
 import ExchangeCard from "./ExchangeCards.jsx";
-import ReactCountryFlag from "react-country-flag";
 import WhatsAppButton from "./WhatsAppButton.jsx";
-import ModeSwitchNeo from "./FromSwitchTo.jsx";
 import NeonModeSwitchFlag from "./FromSwitchTo.jsx";
-import CopyRatesButton from "./CopyRatesButton.jsx";
+import { CopyRatesButton } from "./CopyRatesButton.jsx";
+
 
 const ExchangeBox = () => {
   const { currencies, loading } = useCurrencies();

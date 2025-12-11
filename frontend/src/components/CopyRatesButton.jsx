@@ -9,7 +9,7 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
 
   const vibrate = () => {
     if (navigator.vibrate) {
-      navigator.vibrate(100); // vibración suave
+      navigator.vibrate(200); // vibración suave
     }
   };
 
@@ -80,4 +80,30 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
   );
 };
 
-export default CopyRatesButton;
+const CopyRateButton = ({ from, to, rateValue }) => {
+  const handleCopy = () => {
+    const text = `Tasa de: ${from} → ${to} : *${formatRate(rateValue, 4)}*`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      // Toast notification
+      toast.success("Tasa copiada!", {
+        position: "bottom-center",
+        theme: "dark",
+        autoClose: 900,
+      });
+
+      if (navigator.vibrate) navigator.vibrate(150);
+    });
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="px-2 py-1 text-xs bg-cyan-600 hover:bg-cyan-500 rounded-lg shadow-md"
+    >
+      Copiar
+    </button>
+  );
+};
+
+export { CopyRatesButton, CopyRateButton };
