@@ -8,6 +8,7 @@ import {
   useCurrencies,
 } from "./context/CurrencyProvider.jsx";
 import Filter from "./components/Filter.jsx";
+import { ToastContainer } from "react-toastify";
 
 function AppContent() {
   const { fetchData, loading, updateOneFiatApi } = useCurrencies();
@@ -23,6 +24,7 @@ function AppContent() {
         </div>
 
         <ExchangeBox />
+        <ToastContainer />
       </main>
     </div>
   );

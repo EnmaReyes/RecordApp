@@ -71,3 +71,13 @@
 .animate-shake {
   animation: shake 0.35s ease-in-out;
 }
+
+
+/* Neon shadow effects buton Copy */
+.shadow-neon-blue {
+  box-shadow: 0 0 8px #00acee, 0 0 16px #00acee;
+}
+
+.shadow-neon-blue-strong {
+  box-shadow: 0 0 12px #00acee, 0 0 24px #00acee, inset 0 0 8px #00acee;
+}
