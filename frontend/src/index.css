@@ -41,3 +41,33 @@
     @apply relative w-[calc(100%-2px)] h-[calc(100%-2px)] m-[1.5px] bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl ;
   }
 }
+/* === Efecto 3D === */
+.perspective {
+  perspective: 1000px;
+}
+
+.transform-style-preserve {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Shake */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-shake {
+  animation: shake 0.35s ease-in-out;
+}
