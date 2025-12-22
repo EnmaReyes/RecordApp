@@ -18,6 +18,9 @@ export default function ExchangeCard({
   onRateCalculated,
 }) {
   const [margin, setMargin] = useState(initialMargin);
+  const [calculatedRate, setCalculatedRate] = useState(4);
+
+  const zeroCount = Math.max(1, Math.min(calculatedRate - 3, 3));
 
   const rate = useMemo(() => {
     const marginDecimal = margin / 100;
@@ -43,20 +46,39 @@ export default function ExchangeCard({
         <span>→</span>
         <span>{to}</span>
 
-        <div className="absolute right-[-0.5rem] bottom-2">
+        <div className="absolute right-[-0.5rem] bottom-0">
           <CopyRateButton from={from} to={to} rateValue={rate} />
         </div>
       </div>
       <div className="flex flex-col justify-center text-center bg-primary/30 p-2 rounded-lg gap-0.5 mb-2">
         <h2 className="text-2xl font-bold text-cyan-400 text-center mb-1">
-          {formatRate(rate, 4)}
+          {formatRate(rate, calculatedRate)}
         </h2>
-        <p className="text-center text-sm text-white/85">
-          1 {from} = {formatRate(rate, 4)} {to}
-        </p>
+
+        <div className="flex items-center justify-center gap-4 w-full max-w-[280px] mx-auto py-2">
+          <button
+            className="w-9 h-9 flex items-center justify-center bg-primary/30 rounded-lg text-white font-bold transition button"
+            onClick={() => setCalculatedRate((prev) => prev - 1)}
+            disabled={calculatedRate <= 1}
+          >
+            −
+          </button>
+
+          <p className="min-w-[60px] text-center text-lg font-bold text-white/85">
+            {`.0` + "0".repeat(zeroCount)}
+          </p>
+
+          <button
+            className="w-9 h-9 flex items-center justify-center bg-primary/30 rounded-lg text-white font-bold transition button"
+            onClick={() => setCalculatedRate((prev) => prev + 1)}
+            disabled={calculatedRate >= 8}
+          >
+            +
+          </button>
+        </div>
       </div>
 
-      <div className="text-xs text-slate-400 border border-slate-700 p-2 rounded-lg mb-4">
+      <div className="text-xs text-slate-200 border border-slate-700 p-2 rounded-lg mb-4">
         <p>
           {from} Buy: {formatRate(buyPrice, 2)}
         </p>
@@ -74,13 +96,13 @@ export default function ExchangeCard({
           type="range"
           min="0"
           max="20"
-          step="0.1"
+          step="0.5"
           value={margin}
           onChange={(e) => setMargin(parseFloat(e.target.value))}
-          className="w-full accent-cyan-400 cursor-pointer"
+          className="w-full accent-cyan-400 cursor-pointer "
         />
       </div>
-      <div className="space-y-2">
+      {/*<div className="space-y-2">
         <div className="flex items-center justify-center gap-3">
           <button
             className="px-3 py-1 bg-primary/30 rounded text-white button"
@@ -96,7 +118,7 @@ export default function ExchangeCard({
             +
           </button>
         </div>
-      </div>
+      </div>*/}
     </div>
   );
 }

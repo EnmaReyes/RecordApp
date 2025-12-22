@@ -71,9 +71,6 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
         transition-all duration-300
         hover:shadow-[0_0_15px_#00aaff]
       "
-      style={{
-        boxShadow: "0 0 8px #00aaff, 0 0 16px #00aaff, inset 0 0 8px #00aaff",
-      }}
     >
       <IoCopy />
     </button>
@@ -99,9 +96,13 @@ const CopyRateButton = ({ from, to, rateValue }) => {
   return (
     <button
       onClick={handleCopy}
-      className="px-2 py-1 text-xs bg-cyan-600 hover:bg-cyan-500 rounded-lg shadow-md"
+      className="px-4 py-2 rounded-lg font-semibold text-white 
+        bg-[#00aaff]
+        transition-all duration-300
+        hover:shadow-[0_0_15px_#00aaff]
+      "
     >
-      Copiar
+      <IoCopy />
     </button>
   );
 };
