@@ -48,7 +48,7 @@ const fiatList = [
 
 // ✅ Monto mínimo personalizado por fiat
 const minAmount = {
-  VES: 5000,
+  VES: 10000,
   COP: 200000,
   MXN: 1000,
   PEN: 200,
