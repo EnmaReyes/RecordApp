@@ -5,7 +5,6 @@ import WhatsAppButton from "./WhatsAppButton.jsx";
 import NeonModeSwitchFlag from "./FromSwitchTo.jsx";
 import { CopyRatesButton } from "./CopyRatesButton.jsx";
 
-
 const ExchangeBox = () => {
   const { currencies, loading } = useCurrencies();
   const [calculatedRates, setCalculatedRates] = useState([]);
@@ -77,6 +76,7 @@ const ExchangeBox = () => {
     ARG: calculatedRates.find((r) => r.from === "ARS" && r.to === "VES")?.rate,
     ESP: calculatedRates.find((r) => r.from === "EUR" && r.to === "VES")?.rate,
     URU: calculatedRates.find((r) => r.from === "UYU" && r.to === "VES")?.rate,
+    USD: calculatedRates.find((r) => r.from === "USD" && r.to === "VES")?.rate,
     VEN_COL: calculatedRates.find((r) => r.from === "VES" && r.to === "COP")
       ?.rate,
   };
