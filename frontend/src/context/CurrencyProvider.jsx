@@ -12,7 +12,6 @@ export const CurrencyProvider = ({ children }) => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const urlDB = import.meta.env.VITE_URLDB;
 
-
   // ⚙️ Llama a la API para actualizar las DB
   const updateFromApi = async () => {
     try {
@@ -73,7 +72,6 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-
   // 💾 Obtiene los datos ya guardados en la DB
   const fetchFromDB = async () => {
     const fiatList = [
@@ -122,7 +120,6 @@ export const CurrencyProvider = ({ children }) => {
     fetchDBData();
   }, []);
 
-
   // 🔁 Carga completa: actualiza + trae
   const fetchData = async () => {
     setLoading(true);
@@ -134,8 +131,32 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
+  const useMediaQuery = (query) => {
+    const [matches, setMatches] = useState(
+      () => window.matchMedia(query).matches
+    );
+
+    useEffect(() => {
+      const media = window.matchMedia(query);
+      const listener = () => setMatches(media.matches);
+
+      media.addEventListener("change", listener);
+      return () => media.removeEventListener("change", listener);
+    }, [query]);
+
+    return matches;
+  };
+
   return (
-    <CurrencyContext.Provider value={{ currencies, loading, fetchData, updateOneFiatApi }}>
+    <CurrencyContext.Provider
+      value={{
+        currencies,
+        loading,
+        fetchData,
+        updateOneFiatApi,
+        useMediaQuery,
+      }}
+    >
       {children}
     </CurrencyContext.Provider>
   );
