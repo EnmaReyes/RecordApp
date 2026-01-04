@@ -5,6 +5,7 @@ import {
   formatRate,
 } from "../utils/exchangeRates";
 import { CopyRateButton } from "./CopyRatesButton";
+import { useCurrencies } from "../context/CurrencyProvider.jsx";
 
 export default function ExchangeCard({
   from,
@@ -17,9 +18,10 @@ export default function ExchangeCard({
   initialMargin = 8,
   onRateCalculated,
 }) {
+  const { useMediaQuery } = useCurrencies();
   const [margin, setMargin] = useState(initialMargin);
   const [calculatedRate, setCalculatedRate] = useState(4);
-
+  const isDesktop = useMediaQuery("(min-width: 768px)");
   const zeroCount = Math.max(1, Math.min(calculatedRate - 3, 3));
 
   const rate = useMemo(() => {
@@ -89,36 +91,39 @@ export default function ExchangeCard({
 
       <div className="space-y-2">
         <p className="text-xs text-slate-300">Profit Margin</p>
+
         <div className="flex items-center justify-center">
           <span className="text-sm">{margin.toFixed(1)} %</span>
         </div>
-        <input
-          type="range"
-          min="0"
-          max="20"
-          step="0.5"
-          value={margin}
-          onChange={(e) => setMargin(parseFloat(e.target.value))}
-          className="w-full accent-cyan-400 cursor-pointer "
-        />
-      </div>
-      {/*<div className="space-y-2">
-        <div className="flex items-center justify-center gap-3">
-          <button
-            className="px-3 py-1 bg-primary/30 rounded text-white button"
-            onClick={() => setMargin((prev) => Math.max(0, prev - 0.5))}
-          >
-            -
-          </button>
 
-          <button
-            className="px-3 py-1 bg-primary/30 rounded text-white button"
-            onClick={() => setMargin((prev) => Math.min(20, prev + 0.5))}
-          >
-            +
-          </button>
-        </div>
-      </div>*/}
+        {isDesktop ? (
+          <input
+            type="range"
+            min="0"
+            max="20"
+            step="0.5"
+            value={margin}
+            onChange={(e) => setMargin(+e.target.value)}
+            className="w-full accent-cyan-400 cursor-pointer"
+          />
+        ) : (
+          <div className="flex items-center justify-center gap-3">
+            <button
+              className="px-3 py-1 bg-primary/30 rounded text-white button"
+              onClick={() => setMargin((v) => Math.max(0, v - 0.5))}
+            >
+              −
+            </button>
+
+            <button
+              className="px-3 py-1 bg-primary/30 rounded text-white button"
+              onClick={() => setMargin((v) => Math.min(20, v + 0.5))}
+            >
+              +
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
