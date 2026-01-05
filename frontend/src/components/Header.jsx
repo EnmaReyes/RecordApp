@@ -34,6 +34,12 @@ export default function Header() {
           >
             Tasas
           </a>
+           <a
+            className="text-white hover:text-primary textanimate"
+            href="/calculator"
+          >
+            Calculador
+          </a>
         </nav>
       </div>
     </header>
