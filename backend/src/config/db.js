@@ -1,3 +1,33 @@
+import pkg from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const { Pool } = pkg;
+
+const isProduction = !!process.env.DATABASE_URL;
+
+export const pool = new Pool(
+  isProduction
+    ? {
+        // 🌐 Producción (Vercel + Neon)
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+        max: 5, // ideal para serverless
+      }
+    : {
+        // 💻 Desarrollo (local)
+        host: process.env.POSTGRES_HOST,
+        user: process.env.POSTGRES_USER,
+        password: process.env.POSTGRES_PASSWORD,
+        database: process.env.POSTGRES_DATABASE,
+        port: process.env.POSTGRES_PORT || 5432,
+      }
+);
+/*
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 dotenv.config();
@@ -32,3 +62,4 @@ if (process.env.DATABASE_URL) {
 }
 
 export default sequelize;
+*/
