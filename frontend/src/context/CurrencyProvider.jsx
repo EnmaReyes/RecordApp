@@ -5,14 +5,51 @@ import { calcSpread } from "../utils/calcSpread.js";
 const CurrencyContext = createContext();
 export const useCurrencies = () => useContext(CurrencyContext);
 
+/**
+ * 🔁 Normaliza datos del backend (snake_case → camelCase)
+ */
+const normalizeCurrency = (item) => ({
+  id: item.id,
+  fiat: item.fiat,
+
+  buyPrice: item.buy_price,
+  sellPrice: item.sell_price,
+
+  buyMin: item.buy_min,
+  sellMin: item.sell_min,
+  buyMax: item.buy_max,
+  sellMax: item.sell_max,
+
+  buyMethods: item.buy_methods || [],
+  sellMethods: item.sell_methods || [],
+
+  buyAdvertiser: item.buy_advertiser,
+  sellAdvertiser: item.sell_advertiser,
+
+  createdAt: item.created_at,
+});
+
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL;
-  const urlDB = import.meta.env.VITE_URLDB;
+  const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
+  const urlDB = import.meta.env.VITE_URLDB; // /prices
 
-  // ⚙️ Llama a la API para actualizar las DB
+  const fiatOrder = [
+    "VES",
+    "COP",
+    "MXN",
+    "PEN",
+    "CLP",
+    "ARS",
+    "EUR",
+    "BRL",
+    "UYU",
+    "USD",
+  ];
+
+  // 🔄 Actualiza DB desde API externa
   const updateFromApi = async () => {
     try {
       await axios.get(apiUrl, {
@@ -23,69 +60,35 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
+  // 🔄 Actualiza UN fiat
   const updateOneFiatApi = async (fiat) => {
     try {
       await axios.get(`${apiUrl}?fiat=${fiat}`, {
         headers: { "Cache-Control": "no-cache" },
       });
-    } catch (error) {
-      console.error(`❌ Error updating ${fiat} from API:`, error);
-    }
 
-    try {
-      const response = await axios.get(`${urlDB}/${fiat}`, {
-        headers: { "Cache-Control": "no-cache" },
-      });
+      const response = await axios.get(`${urlDB}/${fiat}`);
+      const raw = response.data.data || response.data;
 
-      const updated = response.data.data || response.data;
+      const normalized = normalizeCurrency(raw);
 
-      const spreadCurrency = {
-        ...updated,
-        spread: calcSpread(updated.sellPrice, updated.buyPrice),
+      const updated = {
+        ...normalized,
+        spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
       };
 
-      // 3️⃣ Reemplaza SOLO ese fiat dentro del estado
-      setCurrencies((prev) => {
-        const replaced = prev.map((c) =>
-          c.fiat === fiat ? spreadCurrency : c
-        );
-
-        const fiatList = [
-          "VES",
-          "COP",
-          "MXN",
-          "PEN",
-          "CLP",
-          "ARS",
-          "EUR",
-          "BRL",
-          "UYU",
-          "USD",
-        ];
-
-        return replaced.sort(
-          (a, b) => fiatList.indexOf(a.fiat) - fiatList.indexOf(b.fiat)
-        );
-      });
+      setCurrencies((prev) =>
+        prev
+          .map((c) => (c.fiat === fiat ? updated : c))
+          .sort((a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat))
+      );
     } catch (error) {
-      console.error(`❌ Error fetching ${fiat} from DB:`, error);
+      console.error(`❌ Error updating ${fiat}:`, error);
     }
   };
 
-  // 💾 Obtiene los datos ya guardados en la DB
+  // 💾 Obtiene datos desde DB
   const fetchFromDB = async () => {
-    const fiatList = [
-      "VES",
-      "COP",
-      "MXN",
-      "PEN",
-      "CLP",
-      "ARS",
-      "EUR",
-      "BRL",
-      "UYU",
-      "USD",
-    ];
     try {
       const response = await axios.get(urlDB, {
         headers: { "Cache-Control": "no-cache" },
@@ -93,34 +96,28 @@ export const CurrencyProvider = ({ children }) => {
 
       const rawData = response.data.data || response.data;
 
-      const formattedData = rawData
-        .map((item) => ({
-          ...item,
-          spread: calcSpread(item.sellPrice, item.buyPrice),
-        }))
-        .sort((a, b) => {
-          return fiatList.indexOf(a.fiat) - fiatList.indexOf(b.fiat);
-        });
+      const formatted = rawData
+        .map((item) => {
+          const normalized = normalizeCurrency(item);
+          return {
+            ...normalized,
+            spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
+          };
+        })
+        .sort((a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat));
 
-      setCurrencies(formattedData);
+      setCurrencies(formatted);
     } catch (error) {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
-  // 🚀 Al montar, trae los datos de la DB
-  useEffect(() => {
-    const fetchDBData = async () => {
-      try {
-        await fetchFromDB();
-      } catch (error) {
-        console.error("❌ Error fetching initial currencies from DB:", error);
-      }
-    };
 
-    fetchDBData();
+  // 🚀 Al montar
+  useEffect(() => {
+    fetchFromDB();
   }, []);
 
-  // 🔁 Carga completa: actualiza + trae
+  // 🔁 Refetch completo
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -131,6 +128,7 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
+  // 📱 Media Query helper
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches
