@@ -3,6 +3,7 @@ import { FaClock } from "react-icons/fa";
 import { useCurrencies } from "../context/CurrencyProvider";
 import ReactCountryFlag from "react-country-flag";
 import "../index.css";
+import { formatUpdateTime } from "./DayAndTime";
 
 const CurrencyTable = ({ onRefreshOneFiat }) => {
   const { currencies, loading } = useCurrencies();
@@ -40,10 +41,15 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     setLoadingFiat(null);
   };
 
-  const Update = new Date(currencies[0]?.updatedAt).toLocaleTimeString(
-    "en-US",
-    { hour: "2-digit", minute: "2-digit" }
-  );
+  const lastUpdated = currencies.reduce((latest, c) => {
+    return !latest || new Date(c.createdAt) > new Date(latest.createdAt)
+      ? c
+      : latest;
+  }, null);
+
+  const updateLabel = lastUpdated
+    ? formatUpdateTime(lastUpdated.createdAt)
+    : "--";
 
   if (loading || currencies.length === 0) {
     return (
@@ -64,7 +70,7 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
           <div className="flex items-center justify-center text-sm text-gray-300">
             <FaClock className="mr-2" />
             <span className="flex flex-col text-end">
-              Última actualización<p className="font-bold">{Update}</p>
+              Última actualización<p className="font-bold">{updateLabel}</p>
             </span>
           </div>
         </div>
