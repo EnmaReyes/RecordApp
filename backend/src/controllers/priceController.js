@@ -1,4 +1,4 @@
-import { PricesModel } from "../models/prices.model.js";
+import { PricesModel } from "../models/Price.js";
 import {
   fetchP2PData,
   fetchAllCurrencies,
