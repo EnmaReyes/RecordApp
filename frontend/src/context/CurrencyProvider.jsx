@@ -27,6 +27,7 @@ const normalizeCurrency = (item) => ({
   sellAdvertiser: item.sell_advertiser,
 
   createdAt: item.created_at,
+  updatedAt: item.updated_at,
 });
 
 export const CurrencyProvider = ({ children }) => {
