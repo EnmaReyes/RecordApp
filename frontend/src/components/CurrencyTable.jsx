@@ -42,14 +42,16 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
   };
 
   const lastUpdated = currencies.reduce((latest, c) => {
-    return !latest || new Date(c.createdAt) > new Date(latest.createdAt)
+    if (!c.updatedAt) return latest;
+
+    return !latest || new Date(c.updatedAt) > new Date(latest.updatedAt)
       ? c
       : latest;
   }, null);
 
   const updateLabel = lastUpdated
-    ? formatUpdateTime(lastUpdated.createdAt)
-    : "--";
+  ? formatUpdateTime(lastUpdated.updatedAt)
+  : "--";
 
   if (loading || currencies.length === 0) {
     return (
