@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { calcSpread } from "../utils/calcSpread.js";
-
 const CurrencyContext = createContext();
 export const useCurrencies = () => useContext(CurrencyContext);
 
@@ -72,7 +71,6 @@ export const CurrencyProvider = ({ children }) => {
       const raw = response.data.data || response.data;
 
       const normalized = normalizeCurrency(raw);
-
       const updated = {
         ...normalized,
         spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
