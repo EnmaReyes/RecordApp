@@ -1,7 +1,7 @@
-export const formatUpdateTime = (dateString) => {
-  if (!dateString) return "--";
+export const formatUpdateTime = (dateValue) => {
+  if (!dateValue) return "--";
 
-  const date = new Date(dateString);
+  const date = new Date(dateValue);
   const now = new Date();
 
   const isSameDay = (d1, d2) =>
@@ -12,18 +12,15 @@ export const formatUpdateTime = (dateString) => {
   const yesterday = new Date();
   yesterday.setDate(now.getDate() - 1);
 
-  const time = date.toLocaleTimeString("es-AR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = date
+    .toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    })
+    .toLowerCase();
 
-  if (isSameDay(date, now)) {
-    return `Hoy ${time}`;
-  }
-
-  if (isSameDay(date, yesterday)) {
-    return `Ayer ${time}`;
-  }
+  if (isSameDay(date, now)) return `Hoy ${time}`;
+  if (isSameDay(date, yesterday)) return `Ayer ${time}`;
 
   return (
     date.toLocaleDateString("es-AR", {

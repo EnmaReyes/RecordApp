@@ -41,18 +41,6 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     setLoadingFiat(null);
   };
 
-  const lastUpdated = currencies.reduce((latest, c) => {
-    if (!c.updatedAt) return latest;
-
-    return !latest || new Date(c.updatedAt) > new Date(latest.updatedAt)
-      ? c
-      : latest;
-  }, null);
-
-  const updateLabel = lastUpdated
-  ? formatUpdateTime(lastUpdated.updatedAt)
-  : "--";
-
   if (loading || currencies.length === 0) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-transparent text-white">
@@ -60,6 +48,14 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
       </div>
     );
   }
+
+  const latestUpdate = currencies
+    .filter((c) => c.updatedAt)
+    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+
+  const updateLabel = latestUpdate
+    ? formatUpdateTime(latestUpdate.updatedAt)
+    : "--";
 
   return (
     <div
@@ -71,8 +67,9 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
           <h2 className="text-3xl font-bold">PRECIOS</h2>
           <div className="flex items-center justify-center text-sm text-gray-300">
             <FaClock className="mr-2" />
-            <span className="flex flex-col text-end">
-              Última actualización<p className="font-bold">{updateLabel}</p>
+            <span className="flex flex-col text-end text-white/60">
+              Última actualización
+              <p className="font-bold text-white">{updateLabel}</p>
             </span>
           </div>
         </div>
