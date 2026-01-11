@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import Header from "./components/Header";
-import ExchangeHero from "./components/ExchangeHero";
+import ExchangeHero from "./components/ExchangeHero.jsx";
 import CurrencyTable from "./components/CurrencyTable.jsx";
 import ExchangeBox from "./components/ExchangeBox.jsx";
 import {
@@ -9,31 +8,37 @@ import {
 } from "./context/CurrencyProvider.jsx";
 import Filter from "./components/Filter.jsx";
 import { ToastContainer } from "react-toastify";
+import { Routes, Route } from "react-router-dom";
+import { ExchangeCalculator } from "./components/ExchangeCalculator.jsx";
+import { Layout } from "./layout.jsx";
 
-function AppContent() {
+const Home = () => {
   const { fetchData, loading, updateOneFiatApi } = useCurrencies();
 
   return (
-    <div className="bg-home-gradient min-h-screen text-white">
-      <Header />
-      <main className="flex flex-col justify-center items-center mx-auto px-4 py-8 ">
-        <ExchangeHero onRefresh={fetchData} loading={loading} />
-        <CurrencyTable onRefreshOneFiat={updateOneFiatApi} />
-        <div className="sticky top-8 z-50">
-          <Filter />
-        </div>
+    <>
+      <ExchangeHero onRefresh={fetchData} loading={loading} />
+      <CurrencyTable onRefreshOneFiat={updateOneFiatApi} />
 
-        <ExchangeBox />
-        <ToastContainer />
-      </main>
-    </div>
+      <div className="sticky top-8 z-50">
+        <Filter />
+      </div>
+
+      <ExchangeBox />
+      <ToastContainer />
+    </>
   );
-}
+};
 
 export default function App() {
   return (
     <CurrencyProvider>
-      <AppContent />
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/calculator" element={<ExchangeCalculator />} />
+        </Route>
+      </Routes>
     </CurrencyProvider>
   );
 }
