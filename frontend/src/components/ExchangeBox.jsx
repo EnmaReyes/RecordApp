@@ -4,6 +4,7 @@ import ExchangeCard from "./ExchangeCards.jsx";
 import WhatsAppButton from "./WhatsAppButton.jsx";
 import NeonModeSwitchFlag from "./FromSwitchTo.jsx";
 import { CopyRatesButton } from "./CopyRatesButton.jsx";
+import { useCallback } from "react";
 
 const ExchangeBox = () => {
   const { currencies, loading } = useCurrencies();
@@ -35,17 +36,23 @@ const ExchangeBox = () => {
     PEN: "Soles peruanos",
   };
 
-  const handleRateCalculated = ({ from, to, rate }) => {
-    setCalculatedRates((prev) => {
-      const existing = prev.find((r) => r.from === from && r.to === to);
-      if (existing) {
-        return prev.map((r) =>
-          r.from === from && r.to === to ? { from, to, rate } : r
-        );
-      }
-      return [...prev, { from, to, rate }];
-    });
-  };
+const handleRateCalculated = useCallback(({ from, to, rate }) => {
+  setCalculatedRates((prev) => {
+    const existing = prev.find((r) => r.from === from && r.to === to);
+
+    if (existing && existing.rate === rate) {
+      return prev;
+    }
+
+    if (existing) {
+      return prev.map((r) =>
+        r.from === from && r.to === to ? { from, to, rate } : r
+      );
+    }
+
+    return [...prev, { from, to, rate }];
+  });
+}, []);
 
   if (loading || currencies.length === 0)
     return <p className="text-center text-white">Loading...</p>;

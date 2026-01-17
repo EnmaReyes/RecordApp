@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import ExchangeHero from "./components/ExchangeHero.jsx";
-import CurrencyTable from "./components/CurrencyTable.jsx";
-import ExchangeBox from "./components/ExchangeBox.jsx";
-import {
-  CurrencyProvider,
-  useCurrencies,
-} from "./context/CurrencyProvider.jsx";
-import Filter from "./components/Filter.jsx";
-import { ToastContainer } from "react-toastify";
 import { Routes, Route } from "react-router-dom";
-import { ExchangeCalculator } from "./components/ExchangeCalculator.jsx";
-import { Layout } from "./layout.jsx";
+import { Layout } from "./layout";
+import ExchangeHero from "./components/ExchangeHero";
+import CurrencyTable from "./components/CurrencyTable";
+import ExchangeBox from "./components/ExchangeBox";
+import Filter from "./components/Filter";
+import { ToastContainer } from "react-toastify";
+import { useCurrencies } from "./context/CurrencyProvider";
+import { ExchangeCalculator } from "./components/Calculator/ExchangeCalculator";
 
 const Home = () => {
   const { fetchData, loading, updateOneFiatApi } = useCurrencies();
@@ -32,13 +28,11 @@ const Home = () => {
 
 export default function App() {
   return (
-    <CurrencyProvider>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/calculator" element={<ExchangeCalculator />} />
-        </Route>
-      </Routes>
-    </CurrencyProvider>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route index element={<Home />} />
+        <Route path="calculator" element={<ExchangeCalculator />} />
+      </Route>
+    </Routes>
   );
 }
