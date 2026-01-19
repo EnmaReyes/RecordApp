@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   calculateGeneral,
-  calculateCOPtoVES,
+  calculateCOPtoFiat,
   formatRate,
 } from "../utils/exchangeRates";
 import { CopyRateButton } from "./CopyRatesButton";
@@ -26,12 +26,13 @@ export default function ExchangeCard({
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const zeroCount = Math.max(1, Math.min(calculatedRate - 3, 3));
   const navigate = useNavigate();
+
   const rate = useMemo(() => {
     const marginDecimal = margin / 100;
 
-    // ✅ Lógica especial: solo COP → VES usa calculateCOPtoVES
-    if (from === "COP" && to === "VES") {
-      return calculateCOPtoVES(buyPrice, baseSell || baseBuy, marginDecimal);
+    // ✅ Lógica especial: solo COP → VES usa calculateCOPtoFiat
+    if (from === "COP") {
+      return calculateCOPtoFiat(buyPrice, baseSell || baseBuy, marginDecimal);
     }
 
     // Todas las demás tasas usan calculateGeneral
