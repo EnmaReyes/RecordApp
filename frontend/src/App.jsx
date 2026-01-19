@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { Layout } from "./layout";
+import { Layout } from "./Layout.jsx";
 import ExchangeHero from "./components/ExchangeHero";
 import CurrencyTable from "./components/CurrencyTable";
 import ExchangeBox from "./components/ExchangeBox";
