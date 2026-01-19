@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
-import { calcSpread } from "../utils/calcSpread.js";
+import { calcSpread } from "../utils/calcs.js";
 const CurrencyContext = createContext();
 export const useCurrencies = () => useContext(CurrencyContext);
 

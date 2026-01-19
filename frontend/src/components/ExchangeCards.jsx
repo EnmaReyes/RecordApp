@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   calculateGeneral,
-  calculateCOPtoVES,
+  calculateCOPtoFiat,
   formatRate,
 } from "../utils/exchangeRates";
 import { CopyRateButton } from "./CopyRatesButton";
 import { useCurrencies } from "../context/CurrencyProvider.jsx";
+import { IoCalculator } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 export default function ExchangeCard({
   from,
@@ -23,13 +25,14 @@ export default function ExchangeCard({
   const [calculatedRate, setCalculatedRate] = useState(4);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const zeroCount = Math.max(1, Math.min(calculatedRate - 3, 3));
+  const navigate = useNavigate();
 
   const rate = useMemo(() => {
     const marginDecimal = margin / 100;
 
-    // ✅ Lógica especial: solo COP → VES usa calculateCOPtoVES
-    if (from === "COP" && to === "VES") {
-      return calculateCOPtoVES(buyPrice, baseSell || baseBuy, marginDecimal);
+    // ✅ Lógica especial: solo COP → VES usa calculateCOPtoFiat
+    if (from === "COP") {
+      return calculateCOPtoFiat(buyPrice, baseSell || baseBuy, marginDecimal);
     }
 
     // Todas las demás tasas usan calculateGeneral
@@ -37,20 +40,26 @@ export default function ExchangeCard({
   }, [buyPrice, sellPrice, baseBuy, baseSell, margin, from, to]);
 
   useEffect(() => {
-    if (onRateCalculated && rate) {
+    if (rate != null) {
       onRateCalculated({ from, to, rate });
     }
   }, [rate, from, to, onRateCalculated]);
+
+  const handleGoCalculator = () => {
+    navigate("/calculator", {
+      state: { from, to, rate },
+    });
+  };
   return (
     <div className="bg-white/5 text-white p-5 rounded-2xl shadow-xl border border-slate-700 w-[260px] text-center">
-      <div className="flex items-center justify-center gap-2 text-sm text-blue-300 mb-2 relative">
-        <span>{from}</span>
-        <span>→</span>
-        <span>{to}</span>
-
-        <div className="absolute right-[-0.5rem] bottom-0">
-          <CopyRateButton from={from} to={to} rateValue={rate} />
+      <div className="flex items-center justify-between text-sm text-blue-300 mb-2">
+        <IoCalculator size={30} cursor="pointer" onClick={handleGoCalculator} />
+        <div className="flex items-center gap-1">
+          <span className="font-bold">{from}</span>
+          <span>→</span>
+          <span className="font-bold">{to}</span>
         </div>
+        <CopyRateButton from={from} to={to} rateValue={rate} />
       </div>
       <div className="flex flex-col justify-center text-center bg-primary/30 p-2 rounded-lg gap-0.5 mb-2">
         <h2 className="text-2xl font-bold text-cyan-400 text-center mb-1">
