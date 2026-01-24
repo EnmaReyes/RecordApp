@@ -189,7 +189,7 @@ export const Calculator = ({ from, to }) => {
             {formatNumber(result)}
           </p>
           <p className="text-xs text-white mb-1">
-            {mode === "receive" ? fromFiat : toFiat}
+            {mode === "receive" ? toFiat : fromFiat}
           </p>
           <button
             onClick={handleCopy}
