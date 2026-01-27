@@ -43,10 +43,13 @@ export const Calculator = ({ from, to }) => {
   const [margin, setMargin] = useState(getDefaultMargin(fromFiat));
   const debouncedMargin = useDebounce(margin, 180);
 
-  // Reset margin cuando cambia la moneda base
   useEffect(() => {
+    // Reset margin
     setMargin(getDefaultMargin(fromFiat));
-  }, [fromFiat]);
+
+    // Reset input amount
+    amountInput?.setRawValue("");
+  }, [fromFiat, toFiat, mode]);
 
   /* ------------------ Monedas ------------------ */
   const fromCurrency = useMemo(

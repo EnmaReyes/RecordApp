@@ -46,6 +46,7 @@ export const useThousandsInput = () => {
     ref: inputRef,
     value: formatThousands(rawValue),
     rawValue,
+    setRawValue,
     onChange: handleChange,
   };
 };
