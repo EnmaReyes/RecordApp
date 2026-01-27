@@ -1,33 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   calculateGeneral,
   calculateCOPtoFiat,
 } from "../../utils/exchangeRates";
 import { useCurrencies } from "../../context/CurrencyProvider";
 import { useThousandsInput } from "../../utils/calcs";
+import Marginrates from "../Marginrates";
 
-/* ------------------ Onboarding ------------------
-const ONBOARDING_KEY = "calculator_onboarding_done";
-
-const useOnboarding = () => {
-  const [step, setStep] = useState(() => {
-    return localStorage.getItem(ONBOARDING_KEY) ? null : 0;
-  });
-
-  const next = () => {
-    setStep((prev) => {
-      if (prev === null) return null;
-      if (prev >= 3) {
-        localStorage.setItem(ONBOARDING_KEY, "true");
-        return null;
-      }
-      return prev + 1;
-    });
-  };
-
-  return { step, next };
-};
- */
 /* ------------------ Utils ------------------ */
 const formatNumber = (num = 0) =>
   new Intl.NumberFormat("es-ES", {
@@ -35,10 +14,21 @@ const formatNumber = (num = 0) =>
     maximumFractionDigits: 2,
   }).format(num);
 
+/* ------------------ Debounce Hook ------------------ */
+const useDebounce = (value, delay = 200) => {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+
+  return debounced;
+};
+
 /* ------------------ Calculator ------------------ */
 export const Calculator = ({ from, to }) => {
-  const { currencies, loading } = useCurrencies();
-  /*const { step, next } = useOnboarding();*/
+  const { currencies } = useCurrencies();
 
   const amountInput = useThousandsInput();
   const [mode, setMode] = useState("receive");
@@ -47,35 +37,53 @@ export const Calculator = ({ from, to }) => {
   const [fromFiat, setFromFiat] = useState(from ?? "");
   const [toFiat, setToFiat] = useState(to ?? "");
 
-  /* ------------------ Monedas ------------------ */
-  const fromCurrency = currencies.find((c) => c.fiat === fromFiat);
-  const toCurrency = currencies.find((c) => c.fiat === toFiat);
+  /* ------------------ Margin (CONTROLADO) ------------------ */
+  const getDefaultMargin = (fiat) => (fiat === "BRL" ? 7 : 10);
 
-  /* ------------------ Config ------------------ */
-  const margin = fromFiat === "BRL" ? 0.07 : 0.1;
+  const [margin, setMargin] = useState(getDefaultMargin(fromFiat));
+  const debouncedMargin = useDebounce(margin, 180);
+
+  useEffect(() => {
+    // Reset margin
+    setMargin(getDefaultMargin(fromFiat));
+
+    // Reset input amount
+    amountInput?.setRawValue("");
+  }, [fromFiat, toFiat, mode]);
+
+  /* ------------------ Monedas ------------------ */
+  const fromCurrency = useMemo(
+    () => currencies.find((c) => c.fiat === fromFiat),
+    [currencies, fromFiat],
+  );
+
+  const toCurrency = useMemo(
+    () => currencies.find((c) => c.fiat === toFiat),
+    [currencies, toFiat],
+  );
 
   /* ------------------ RATE ------------------ */
   const rate = useMemo(() => {
     if (!fromCurrency || !toCurrency) return null;
 
-    // Caso especial COP
+    const marginDecimal = debouncedMargin / 100;
+
     if (fromFiat === "COP") {
       return calculateCOPtoFiat(
         fromCurrency.buyPrice,
         toCurrency.sellPrice,
-        margin,
+        marginDecimal,
       );
     }
 
-    // Caso general
     return calculateGeneral(
       toCurrency.sellPrice,
       fromCurrency.buyPrice,
-      margin,
+      marginDecimal,
     );
-  }, [fromCurrency, toCurrency, fromFiat, margin]);
+  }, [fromCurrency, toCurrency, fromFiat, debouncedMargin]);
 
-  /* ------------------ Resultado ------------------ */
+  /* ------------------ RESULT ------------------ */
   const result = useMemo(() => {
     const value = Number(amountInput.rawValue);
     if (!value || !rate) return 0;
@@ -91,30 +99,12 @@ export const Calculator = ({ from, to }) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(formatNumber(result));
     setCopied(true);
-    if (step === 3) next();
     setTimeout(() => setCopied(false), 1200);
   };
 
-  /* ------------------ Onboarding triggers ------------------ 
-  useEffect(() => {
-    if (amountInput.rawValue && step === 0) next();
-  }, [amountInput.rawValue, step, next]);
-
-  useEffect(() => {
-    if (step === 1) next();
-  }, [mode, step, next]);
-
-  if (loading) return null;
-*/
   /* ------------------ UI ------------------ */
   return (
     <div className="relative max-w-[360px] rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 shadow-2xl text-white">
-     {/* {step !== null && (
-        <div className="absolute -top-12 inset-x-0 text-center text-lg text-cyan-300 animate-fadeIn">
-          {hints[step]}
-        </div>
-      )}*/}
-
       <div className="space-y-4">
         {/* FROM → TO */}
         <div className="flex items-center justify-center gap-3">
@@ -162,8 +152,10 @@ export const Calculator = ({ from, to }) => {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`flex-1 py-2 rounded-lg text-sm ${
-                mode === m ? "bg-sky-500 text-white" : "text-slate-300"
+              className={`flex-1 py-2 rounded-lg text-sm transition ${
+                mode === m
+                  ? "bg-sky-500 text-white"
+                  : "text-slate-300 hover:text-white"
               }`}
             >
               {m === "receive" ? "Cuánto recibir" : "Cuánto enviar"}
@@ -171,11 +163,13 @@ export const Calculator = ({ from, to }) => {
           ))}
         </div>
 
-        {/* Rate */}
+        {/* Rate + Margin */}
         {rate && (
-          <div className=" text-center text-cyan-200">
-            <p className="text-sm">Tasa</p>
-            <p className="text-lg titulo">{rate.toFixed(4)}</p>
+          <div className="text-center text-cyan-200 space-y-2">
+            <p className="text-sm">Tasa aplicada</p>
+            <p className="text-lg font-semibold">{rate.toFixed(4)}</p>
+
+            <Marginrates margin={margin} onChangeMargin={setMargin} />
           </div>
         )}
 
@@ -191,9 +185,10 @@ export const Calculator = ({ from, to }) => {
           <p className="text-xs text-white mb-1">
             {mode === "receive" ? toFiat : fromFiat}
           </p>
+
           <button
             onClick={handleCopy}
-            className="absolute top-3 right-3 text-xs bg-sky-500/80 px-3 py-1 rounded-lg"
+            className="absolute top-3 right-3 text-xs bg-sky-500/80 px-3 py-1 rounded-lg transition hover:bg-sky-500"
           >
             {copied ? "✓ Copiado" : "Copiar"}
           </button>
@@ -202,12 +197,3 @@ export const Calculator = ({ from, to }) => {
     </div>
   );
 };
-
-/* ------------------ Hints ------------------ 
-const hints = [
-  "Selecciona las monedas",
-  "Ingresa el monto",
-  "Elige cómo deseas calcular",
-  "Copia el resultado",
-];
-*/
