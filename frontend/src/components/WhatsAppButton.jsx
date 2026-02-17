@@ -45,7 +45,7 @@ sin previo aviso
   const whatsappLink = `https://api.whatsapp.com/send?text=${encodedMessage}`;
 
   return (
-    <div className="fixed right-4 bottom-6 z-50">
+    <div className="fixed right-2 bottom-24 z-50">
       <a
         href={whatsappLink}
         target="_blank"

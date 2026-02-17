@@ -14,6 +14,9 @@ export default {
         accent: "#00D0FF",
         dark: "#0A0F1E",
       },
+      transitionTimingFunction: {
+        app: "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
     },
   },
   plugins: [],
