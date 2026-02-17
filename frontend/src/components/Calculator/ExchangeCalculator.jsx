@@ -18,7 +18,7 @@ export const ExchangeCalculator = () => {
   return (
     <section
       id="calculator"
-      className="w-full max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-12"
+      className="w-full max-w-7xl mx-auto px-4 py-8 mb-6 flex flex-col-reverse lg:flex-row items-center justify-center gap-16 lg:gap-12"
     >
       {/* Stepper */}
       <div className="w-full lg:w-1/2 flex justify-center">

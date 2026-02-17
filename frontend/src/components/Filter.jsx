@@ -36,7 +36,7 @@ const Filter = () => {
         ${
           isSticky
             ? `
-              fixed left-3 top-24 flex-col
+              fixed left-3 top-0 flex-col
               opacity-100 translate-x-0
               h-full justify-center 
             `
