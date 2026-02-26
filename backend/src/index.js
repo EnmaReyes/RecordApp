@@ -3,10 +3,12 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { pool } from "./config/db.js";
 import priceRoutes from "./routes/routesPrices.js";
+import { initDB } from "./config/db.js";
 
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 /* ---------- Middlewares ---------- */
 app.use(
@@ -14,7 +16,7 @@ app.use(
     origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
@@ -32,41 +34,18 @@ app.get("/", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+/* ---------- Start server ---------- */
+const startServer = async () => {
+  try {
+    await initDB();
 
-/* ---------- Local dev only ---------- */
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => console.log(`🚀 Servidor local en puerto ${PORT}`));
-}
+    app.listen(PORT, () => console.log(`🚀 Servidor local en puerto ${PORT}`));
+  } catch (error) {
+    console.error("❌ Error al iniciar:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 export default app;
-
-/*import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import sequelize from "./config/db.js";
-import priceRoutes from "./routes/routesPrices.js";
-
-dotenv.config();
-const app = express();
-
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
-
-app.use(express.json());
-app.use("/prices", priceRoutes);
-
-const PORT = process.env.PORT || 3000;
-
-sequelize.sync({ alter: true }).then(() => {
-  console.log("🟢 DB sincronizada");
-  app.listen(PORT, () =>
-    console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
-  );
-});
-*/

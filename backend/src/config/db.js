@@ -25,8 +25,26 @@ export const pool = new Pool(
         password: process.env.POSTGRES_PASSWORD,
         database: process.env.POSTGRES_DATABASE,
         port: process.env.POSTGRES_PORT || 5432,
-      }
+      },
 );
+
+export const initDB = async () => {
+  try {
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS prices_by_fiat (
+    id SERIAL PRIMARY KEY,
+    fiat VARCHAR(10) NOT NULL UNIQUE,
+    buy_price NUMERIC NOT NULL,
+    sell_price NUMERIC NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+    console.log("✅ Tabla prices verificada/creada");
+  } catch (error) {
+    console.error("❌ Error creando tabla:", error);
+  }
+};
 /*
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
