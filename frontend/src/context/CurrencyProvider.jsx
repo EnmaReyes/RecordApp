@@ -63,14 +63,16 @@ export const CurrencyProvider = ({ children }) => {
   // 🔄 Actualiza UN fiat
   const updateOneFiatApi = async (fiat) => {
     try {
-      await axios.get(`${apiUrl}?fiat=${fiat}`, {
+      // ✅ URL correcta con param dinámico
+      await axios.get(`${apiUrl}${fiat}`, {
         headers: { "Cache-Control": "no-cache" },
       });
 
-      const response = await axios.get(`${urlDB}/${fiat}`);
+      const response = await axios.get(`${urlDB}${fiat}`);
       const raw = response.data.data || response.data;
 
       const normalized = normalizeCurrency(raw);
+
       const updated = {
         ...normalized,
         spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
@@ -79,7 +81,9 @@ export const CurrencyProvider = ({ children }) => {
       setCurrencies((prev) =>
         prev
           .map((c) => (c.fiat === fiat ? updated : c))
-          .sort((a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat))
+          .sort(
+            (a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat),
+          ),
       );
     } catch (error) {
       console.error(`❌ Error updating ${fiat}:`, error);
@@ -130,7 +134,7 @@ export const CurrencyProvider = ({ children }) => {
   // 📱 Media Query helper
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
-      () => window.matchMedia(query).matches
+      () => window.matchMedia(query).matches,
     );
 
     useEffect(() => {
