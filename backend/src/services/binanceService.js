@@ -18,7 +18,10 @@ const fiatList = [
   "BRL",
   "UYU",
   "USD",
+  "PAN",
+  "ECU",
 ];
+const fiatAlias = { ECU: "USD", PAN: "USD" };
 
 const minAmount = {
   VES: 10000,
@@ -30,11 +33,13 @@ const minAmount = {
   EUR: 100,
   UYU: 1000,
   USD: 50,
+  PAN: 50,
+  ECU: 50,
 };
 
 const paymentFilters = {
   VES: ["Mercantil", "Banesco", "pago móvil"],
-  COP: ["Nequi", "Daviplata", "Bancolombia"],
+  COP: ["Nequi", "Daviplata", "Bancolombia", "Llaves Bre-B"],
   MXN: [],
   PEN: ["Yape", "Plin", "BCP"],
   CLP: [],
@@ -42,6 +47,14 @@ const paymentFilters = {
   EUR: ["SEPA", "Transferencia Bancaria", "BBVA", "Santander"],
   UYU: [],
   USD: ["Zelle"],
+  PAN: ["Zinli", "Banco General Panama", "Banesco Panama", "Mercantil Panama"],
+  ECU: [
+    "Banco Pichincha",
+    "Banco Guayaquil",
+    "Banco del Pacífico",
+    "Banco Bolivariano",
+    "Produbanco",
+  ],
 };
 
 /* ---------- BRL externo ---------- */
@@ -72,19 +85,20 @@ async function fetchBRLRate() {
 
 /* ---------- Core ---------- */
 export async function fetchP2PData(fiat) {
-  const min = minAmount[fiat] || 50;
+  const baseFiat = fiatAlias[fiat] || fiat; // si es ECU o PAN → USD
+  const min = minAmount[fiat] || 50; // usa el min propio
   const payTypes = paymentFilters[fiat] || [];
 
   const [sellRaw, buyRaw] = await Promise.all([
-    fetchAds({ fiat, tradeType: "SELL", minAmount: min, payTypes }),
-    fetchAds({ fiat, tradeType: "BUY", minAmount: min, payTypes }),
+    fetchAds({ fiat: baseFiat, tradeType: "SELL", minAmount: min, payTypes }),
+    fetchAds({ fiat: baseFiat, tradeType: "BUY", minAmount: min, payTypes }),
   ]);
 
   const sellSelected = selectRobust(sellRaw);
   const buySelected = selectRobust(buyRaw);
 
   return {
-    fiat,
+    fiat, // mantiene ECU o PAN como etiqueta
     sell: transformOrder(sellSelected),
     buy: transformOrder(buySelected),
   };
