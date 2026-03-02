@@ -98,7 +98,7 @@ export async function fetchP2PData(fiat) {
   const buySelected = selectRobust(buyRaw);
 
   return {
-    fiat, // mantiene ECU o PAN como etiqueta
+    fiat,
     sell: transformOrder(sellSelected),
     buy: transformOrder(buySelected),
   };
@@ -120,6 +120,8 @@ export async function fetchAllCurrencies() {
       fiat,
       buyPrice: data.buy?.price || null,
       sellPrice: data.sell?.price || null,
+      buyMethods: data.buy?.methods || [],
+      sellMethods: data.sell?.methods || [],
     });
 
     await new Promise((r) => setTimeout(r, 500)); // anti-rate limit
