@@ -24,7 +24,6 @@ const normalizeCurrency = (item) => ({
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [timeUpdated, setTimeUpdated] = useState(null);
   const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
   const urlDB = import.meta.env.VITE_URLDB; // /prices
 
@@ -109,15 +108,7 @@ export const CurrencyProvider = ({ children }) => {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
-  const timesUP = () => {
-    let newHour = new Date().toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-    setTimeUpdated(newHour);
-  };
-
+  
   // 🚀 Al montar
   useEffect(() => {
     fetchFromDB();
@@ -129,7 +120,6 @@ export const CurrencyProvider = ({ children }) => {
     try {
       await updateFromApi();
       await fetchFromDB();
-      timesUP();
     } finally {
       setLoading(false);
     }
@@ -160,7 +150,6 @@ export const CurrencyProvider = ({ children }) => {
         fetchData,
         updateOneFiatApi,
         useMediaQuery,
-        timeUpdated,
       }}
     >
       {children}

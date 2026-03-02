@@ -6,7 +6,7 @@ import "../index.css";
 import { formatUpdateTime } from "./DayAndTime";
 
 const CurrencyTable = ({ onRefreshOneFiat }) => {
-  const { currencies, loading, timeUpdated } = useCurrencies();
+  const { currencies, loading } = useCurrencies();
   const [loadingFiat, setLoadingFiat] = React.useState(null);
 
   const fiatNames = {
@@ -57,11 +57,9 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     .filter((c) => c.updatedAt)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
 
-  const updateLabel = timeUpdated
-    ? timeUpdated
-    : latestUpdate
-      ? formatUpdateTime(latestUpdate.updatedAt)
-      : "--";
+  const updateLabel = latestUpdate
+    ? formatUpdateTime(latestUpdate.updatedAt)
+    : "--";
 
   return (
     <div
