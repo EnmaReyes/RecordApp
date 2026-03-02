@@ -10,6 +10,8 @@ function buildRecord(fiat, data) {
     fiat,
     sellPrice: data.sell?.price || null,
     buyPrice: data.buy?.price || null,
+    sellMethods: data.sell?.methods || [],
+    buyMethods: data.buy?.methods || [],
   };
 }
 

@@ -9,6 +9,9 @@ export const PricesModel = {
       ...row,
       buy_price: Number(row.buy_price),
       sell_price: Number(row.sell_price),
+      buy_methods: row.buy_methods || [],
+      sell_methods: row.sell_methods || [],
+      updated_at: row.updated_at,
     }));
   },
 
@@ -20,28 +23,52 @@ export const PricesModel = {
     return result.rows[0];
   },
 
-  async create({ fiat, buyPrice, sellPrice }) {
+  async create({
+    fiat,
+    buyPrice,
+    sellPrice,
+    buyMethods = [],
+    sellMethods = [],
+  }) {
     const result = await pool.query(
       `
-      INSERT INTO prices_by_fiat (fiat, buy_price, sell_price)
-      VALUES ($1, $2, $3)
+      INSERT INTO prices_by_fiat (fiat, buy_price, sell_price, buy_methods, sell_methods, updated_at)
+      VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
       RETURNING *
       `,
-      [fiat, buyPrice, sellPrice],
+      [
+        fiat,
+        buyPrice,
+        sellPrice,
+        JSON.stringify(buyMethods),
+        JSON.stringify(sellMethods),
+      ],
     );
     return result.rows[0];
   },
 
-  async update(fiat, { buyPrice, sellPrice }) {
+  async update(
+    fiat,
+    { buyPrice, sellPrice, buyMethods = [], sellMethods = [] },
+  ) {
     const result = await pool.query(
       `
       UPDATE prices_by_fiat
       SET buy_price = $1,
-          sell_price = $2
-      WHERE fiat = $3
+          sell_price = $2,
+          buy_methods = $3,
+          sell_methods = $4,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE fiat = $5
       RETURNING *
       `,
-      [buyPrice, sellPrice, fiat],
+      [
+        buyPrice,
+        sellPrice,
+        JSON.stringify(buyMethods),
+        JSON.stringify(sellMethods),
+        fiat,
+      ],
     );
     return result.rows[0];
   },
@@ -50,33 +77,32 @@ export const PricesModel = {
     await pool.query("DELETE FROM prices_by_fiat WHERE fiat = $1", [fiat]);
   },
 
-  async upsert({ fiat, buyPrice, sellPrice }) {
+  async upsert({
+    fiat,
+    buyPrice,
+    sellPrice,
+    buyMethods = [],
+    sellMethods = [],
+  }) {
     await pool.query(
       `
-      INSERT INTO prices_by_fiat (fiat, buy_price, sell_price)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (fiat)
-      DO UPDATE SET
-        buy_price = EXCLUDED.buy_price,
-        sell_price = EXCLUDED.sell_price
-      `,
-      [fiat, buyPrice, sellPrice],
+    INSERT INTO prices_by_fiat (fiat, buy_price, sell_price, buy_methods, sell_methods, updated_at)
+    VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
+    ON CONFLICT (fiat)
+    DO UPDATE SET
+      buy_price = EXCLUDED.buy_price,
+      sell_price = EXCLUDED.sell_price,
+      buy_methods = EXCLUDED.buy_methods,
+      sell_methods = EXCLUDED.sell_methods,
+      updated_at = CURRENT_TIMESTAMP
+    `,
+      [
+        fiat,
+        buyPrice,
+        sellPrice,
+        JSON.stringify(buyMethods),
+        JSON.stringify(sellMethods),
+      ],
     );
   },
 };
-
-/*import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
-
-const PricesByFiat = sequelize.define("PricesByFiat", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  fiat: { type: DataTypes.STRING, allowNull: false, unique: true },
-  buyPrice: { type: DataTypes.FLOAT, allowNull: false },
-  sellPrice: { type: DataTypes.FLOAT, allowNull: false },
-  minSingleTransAmount: { type: DataTypes.FLOAT },
-  maxSingleTransAmount: { type: DataTypes.FLOAT },
-  createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-});
-
-export default PricesByFiat;
-*/
