@@ -10,7 +10,7 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
   const [loadingFiat, setLoadingFiat] = React.useState(null);
 
   const fiatNames = {
-    USD: "US Dollar",
+    USD: "Zelle Dollar",
     EUR: "Euro",
     CLP: "Pesos chilenos",
     COP: "Pesos colombianos",
@@ -20,6 +20,8 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     UYU: "Pesos uruguayos",
     BRL: "Reales brasileños",
     PEN: "Soles peruanos",
+    zinli: "Panama USD",
+    ecuador: "Ecuador USD",
   };
 
   const fiatFlags = {
@@ -33,6 +35,8 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     UYU: "UY",
     BRL: "BR",
     PEN: "PE",
+    zinli: "PA",
+    ecuador: "EC",
   };
 
   const handleRefresh = async (fiat) => {
