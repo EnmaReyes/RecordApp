@@ -13,6 +13,8 @@ const Filter = () => {
     UYU: "UY",
     BRL: "BR",
     EUR: "EU",
+    PAN: "PA",
+    ECU: "EC",
   };
 
   const [isSticky, setIsSticky] = useState(false);
