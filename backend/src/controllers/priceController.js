@@ -13,25 +13,12 @@ function buildRecord(fiat, data) {
   };
 }
 
-/* ---------- Helper para obtener data según alias ---------- */
-async function getDataByAlias(fiat) {
-  const aliases = {
-    ecuador: ["Banco Pichincha", "Banco Guayaquil", "Produbanco"],
-    zinli: ["Zinli"],
-  };
-
-  if (aliases[fiat]) {
-    return await fetchP2PData("USD", null, aliases[fiat]);
-  }
-  return await fetchP2PData(fiat);
-}
-
 /* ---------- Obtener y guardar precio por fiat ---------- */
 export async function getPriceByFiat(req, res) {
   const { fiat } = req.params;
 
   try {
-    const data = await getDataByAlias(fiat);
+    const data = await fetchP2PData(fiat);
 
     if (!data || (!data.sell && !data.buy)) {
       return res
@@ -56,26 +43,13 @@ export async function getPriceByFiat(req, res) {
 export async function getAllPrices(req, res) {
   try {
     const prices = await fetchAllCurrencies();
-
-    const [zinliData, ecuadorData] = await Promise.all([
-      getDataByAlias("zinli"),
-      getDataByAlias("ecuador"),
-    ]);
-
-    const extraRecords = [
-      buildRecord("zinli", zinliData),
-      buildRecord("ecuador", ecuadorData),
-    ];
-
-    const allRecords = [...prices, ...extraRecords];
-
-    for (const item of allRecords) {
+    for (const item of prices) {
       await PricesModel.upsert(item);
     }
 
     res.json({
       message: "Precios actualizados correctamente",
-      data: allRecords,
+      data: prices,
     });
   } catch (error) {
     console.error("❌ Error al actualizar precios:", error);
