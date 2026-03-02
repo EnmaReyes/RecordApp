@@ -6,7 +6,7 @@ import "../index.css";
 import { formatUpdateTime } from "./DayAndTime";
 
 const CurrencyTable = ({ onRefreshOneFiat }) => {
-  const { currencies, loading } = useCurrencies();
+  const { currencies, loading, timeUpdated } = useCurrencies();
   const [loadingFiat, setLoadingFiat] = React.useState(null);
 
   const fiatNames = {
@@ -57,9 +57,11 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     .filter((c) => c.updatedAt)
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
 
-  const updateLabel = latestUpdate
-    ? formatUpdateTime(latestUpdate.updatedAt)
-    : "--";
+  const updateLabel = timeUpdated
+    ? timeUpdated
+    : latestUpdate
+      ? formatUpdateTime(latestUpdate.updatedAt)
+      : "--";
 
   return (
     <div
@@ -69,12 +71,12 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
       <div className="w-[90%] md:w-[100%] p-4 md:p-6 card-content">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">PRECIOS</h2>
-          <div className="flex items-center justify-center text-sm text-gray-300">
-            <FaClock className="mr-2" />
-            <span className="flex flex-col text-end text-white/60">
-              Última actualización
+          <div className="flex flex-col items-center justify-center text-sm text-gray-300">
+            <span className="text-end text-white/60">Última actualización</span>
+            <div className="flex flex-row items-center">
+              <FaClock className="mr-2" />
               <p className="font-bold text-white">{updateLabel}</p>
-            </span>
+            </div>
           </div>
         </div>
 

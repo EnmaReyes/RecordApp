@@ -14,16 +14,8 @@ const normalizeCurrency = (item) => ({
   buyPrice: item.buy_price,
   sellPrice: item.sell_price,
 
-  buyMin: item.buy_min,
-  sellMin: item.sell_min,
-  buyMax: item.buy_max,
-  sellMax: item.sell_max,
-
   buyMethods: item.buy_methods || [],
   sellMethods: item.sell_methods || [],
-
-  buyAdvertiser: item.buy_advertiser,
-  sellAdvertiser: item.sell_advertiser,
 
   createdAt: item.created_at,
   updatedAt: item.updated_at,
@@ -32,7 +24,7 @@ const normalizeCurrency = (item) => ({
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [timeUpdated, setTimeUpdated] = useState(null);
   const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
   const urlDB = import.meta.env.VITE_URLDB; // /prices
 
@@ -87,6 +79,7 @@ export const CurrencyProvider = ({ children }) => {
             (a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat),
           ),
       );
+      timesUP();
     } catch (error) {
       console.error(`❌ Error updating ${fiat}:`, error);
     }
@@ -116,6 +109,14 @@ export const CurrencyProvider = ({ children }) => {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
+  const timesUP = () => {
+    let newHour = new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+    setTimeUpdated(newHour);
+  };
 
   // 🚀 Al montar
   useEffect(() => {
@@ -128,6 +129,7 @@ export const CurrencyProvider = ({ children }) => {
     try {
       await updateFromApi();
       await fetchFromDB();
+      timesUP();
     } finally {
       setLoading(false);
     }
@@ -158,6 +160,7 @@ export const CurrencyProvider = ({ children }) => {
         fetchData,
         updateOneFiatApi,
         useMediaQuery,
+        timeUpdated,
       }}
     >
       {children}

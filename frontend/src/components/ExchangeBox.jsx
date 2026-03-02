@@ -39,6 +39,7 @@ const ExchangeBox = () => {
     PAN: "Panama USD",
     ECU: "Ecuador USD",
   };
+  //console.log("datacurrencies", currencies);
 
   const handleRateCalculated = useCallback(({ from, to, rate }) => {
     setCalculatedRates((prev) => {

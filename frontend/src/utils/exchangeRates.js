@@ -11,8 +11,10 @@ export function calculateCOPtoFiat(buyPrice, sellPriceBase, margin = 0.1) {
 }
 
 export function formatRate(rate, decimals = 4) {
-  if (rate === null || isNaN(rate)) return "-";
-  return rate.toFixed(decimals);
+  if (rate === null || rate === undefined) return "-";
+  const num = Number(rate);
+  if (isNaN(num)) return "-";
+  return num.toFixed(decimals);
 }
 
 export function calculateRate({ from, to, sellPrice, buyPriceBase, margin }) {
