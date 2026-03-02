@@ -47,8 +47,8 @@ export const CurrencyProvider = ({ children }) => {
     "BRL",
     "UYU",
     "USD",
-    "zinli",
-    "ecuador",
+    "PAN",
+    "ECU",
   ];
 
   // 🔄 Actualiza DB desde API externa

@@ -20,8 +20,8 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     UYU: "Pesos uruguayos",
     BRL: "Reales brasileños",
     PEN: "Soles peruanos",
-    zinli: "Panama USD",
-    ecuador: "Ecuador USD",
+    PAN: "Panama USD",
+    ECU: "Ecuador USD",
   };
 
   const fiatFlags = {
@@ -35,8 +35,8 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
     UYU: "UY",
     BRL: "BR",
     PEN: "PE",
-    zinli: "PA",
-    ecuador: "EC",
+    PAN: "PA",
+    ECU: "EC",
   };
 
   const handleRefresh = async (fiat) => {

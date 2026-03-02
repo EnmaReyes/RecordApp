@@ -21,6 +21,8 @@ const ExchangeBox = () => {
     UYU: "UY",
     BRL: "BR",
     PEN: "PE",
+    PAN: "PA",
+    ECU: "EC",
   };
 
   const fiatNames = {
@@ -34,25 +36,27 @@ const ExchangeBox = () => {
     UYU: "Pesos uruguayos",
     BRL: "Reales brasileños",
     PEN: "Soles peruanos",
+    PAN: "Panama USD",
+    ECU: "Ecuador USD",
   };
 
-const handleRateCalculated = useCallback(({ from, to, rate }) => {
-  setCalculatedRates((prev) => {
-    const existing = prev.find((r) => r.from === from && r.to === to);
+  const handleRateCalculated = useCallback(({ from, to, rate }) => {
+    setCalculatedRates((prev) => {
+      const existing = prev.find((r) => r.from === from && r.to === to);
 
-    if (existing && existing.rate === rate) {
-      return prev;
-    }
+      if (existing && existing.rate === rate) {
+        return prev;
+      }
 
-    if (existing) {
-      return prev.map((r) =>
-        r.from === from && r.to === to ? { from, to, rate } : r
-      );
-    }
+      if (existing) {
+        return prev.map((r) =>
+          r.from === from && r.to === to ? { from, to, rate } : r,
+        );
+      }
 
-    return [...prev, { from, to, rate }];
-  });
-}, []);
+      return [...prev, { from, to, rate }];
+    });
+  }, []);
 
   if (loading || currencies.length === 0)
     return <p className="text-center text-white">Loading...</p>;
@@ -117,7 +121,7 @@ const handleRateCalculated = useCallback(({ from, to, rate }) => {
               .filter((pair) =>
                 mode === "para"
                   ? pair.to === baseFiat.fiat
-                  : pair.from === baseFiat.fiat
+                  : pair.from === baseFiat.fiat,
               )
               .map((pair) => (
                 <ExchangeCard
