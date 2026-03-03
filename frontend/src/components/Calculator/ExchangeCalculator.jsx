@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calculator } from "./Calculatotr";
 import { CalculatorStepper } from "./CalculatorStepper";
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useCurrencies } from "../../context/CurrencyProvider";
 
 export const ExchangeCalculator = () => {
   const { state } = useLocation();
-  const { currencies, loading } = useCurrencies();
+  const { loading } = useCurrencies();
 
   if (loading) return null;
 
@@ -14,6 +14,13 @@ export const ExchangeCalculator = () => {
   const from = state?.from ?? "COP";
   const to = state?.to ?? "VES";
   const rate = state?.rate;
+
+  useEffect(() => {
+    const section = document.getElementById("calculator");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
 
   return (
     <section

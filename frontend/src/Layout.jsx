@@ -6,7 +6,7 @@ export const Layout = () => {
   return (
     <div className="bg-home-gradient min-h-screen text-white">
       {/* Header → tablet y desktop */}
-      <div className="hidden md:block">
+      <div className="sticky top-0 z-10 hidden md:block">
         <Header />
       </div>
 
