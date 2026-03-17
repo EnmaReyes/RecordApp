@@ -5,6 +5,7 @@ import {
   getDBPrices,
   getDBPriceByFiat,
 } from "../controllers/priceController.js";
+import { googleAuthController } from "../controllers/userController.js";
 
 const router = express.Router();
 
@@ -15,5 +16,8 @@ router.get("/update/:fiat", getPriceByFiat);
 // Obtiene precios desde la base de datos
 router.get("/", getDBPrices);
 router.get("/:fiat", getDBPriceByFiat);
+
+// Users
+router.post("/auth/google", (req, res) => googleAuthController(req, res));
 
 export default router;
