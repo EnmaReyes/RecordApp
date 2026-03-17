@@ -1,7 +1,8 @@
 # Ignorar dependencias
 node_modules/
 */node_modules/
-.env
+backend/.env
+frontend/.env
 
 # Ignorar build outputs
 dist/
