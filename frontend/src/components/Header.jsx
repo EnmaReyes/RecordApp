@@ -1,10 +1,12 @@
 import React from "react";
 import "../App.css";
 import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useCurrencies } from "../context/CurrencyProvider.jsx";
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { auth, logout } = useCurrencies();
 
   const goToSection = (id) => {
     if (location.pathname !== "/") {
@@ -54,6 +56,24 @@ export default function Header() {
             Calculador
           </button>
         </nav>
+        {auth ? (
+          <>
+            <span>{auth.role.toUpperCase()}</span>
+            <button
+              onClick={logout}
+              className="bg-red-500 px-3 py-1 rounded hover:bg-red-700"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <a
+            href="/login"
+            className="bg-green-500 px-3 py-1 rounded hover:bg-green-700"
+          >
+            Login
+          </a>
+        )}
       </div>
     </header>
   );

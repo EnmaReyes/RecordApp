@@ -5,7 +5,6 @@ import {
   formatRate,
 } from "../utils/exchangeRates";
 import { CopyRateButton } from "./CopyRatesButton";
-import { useCurrencies } from "../context/CurrencyProvider.jsx";
 import { IoCalculator } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Marginrates from "./Marginrates.jsx";
