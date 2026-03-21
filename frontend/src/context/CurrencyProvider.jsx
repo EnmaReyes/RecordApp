@@ -26,6 +26,11 @@ export const CurrencyProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
   const urlDB = import.meta.env.VITE_URLDB; // /prices
+  const [auth, setAuth] = useState(() => {
+    const token = localStorage.getItem("jwt");
+    const role = localStorage.getItem("role");
+    return token ? { token, role } : null;
+  });
 
   const fiatOrder = [
     "VES",
@@ -108,7 +113,7 @@ export const CurrencyProvider = ({ children }) => {
       console.error("❌ Error fetching currencies from DB:", error);
     }
   };
-  
+
   // 🚀 Al montar
   useEffect(() => {
     fetchFromDB();
@@ -142,6 +147,19 @@ export const CurrencyProvider = ({ children }) => {
     return matches;
   };
 
+  // 🔐 Login/Logout
+  const login = (token, role) => {
+    localStorage.setItem("jwt", token);
+    localStorage.setItem("role", role);
+    setAuth({ token, role });
+  };
+
+  const logout = () => {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("role");
+    setAuth(null);
+  };
+
   return (
     <CurrencyContext.Provider
       value={{
@@ -150,6 +168,9 @@ export const CurrencyProvider = ({ children }) => {
         fetchData,
         updateOneFiatApi,
         useMediaQuery,
+        auth,
+        login,
+        logout,
       }}
     >
       {children}
