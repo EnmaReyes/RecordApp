@@ -1,5 +1,7 @@
 import pkg from "pg";
 import dotenv from "dotenv";
+import { createPricesTable, PricesModel } from "../models/Price.js";
+import { createUsersTable } from "../models/User.js";
 
 dotenv.config();
 
@@ -30,17 +32,10 @@ export const pool = new Pool(
 
 export const initDB = async () => {
   try {
-    await pool.query(`
-  CREATE TABLE IF NOT EXISTS prices_by_fiat (
-    id SERIAL PRIMARY KEY,
-    fiat VARCHAR(10) NOT NULL UNIQUE,
-    buy_price NUMERIC NOT NULL,
-    sell_price NUMERIC NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+    await createPricesTable();
+    await createUsersTable();
 
-    console.log("✅ Tabla prices verificada/creada");
+    console.log("✅ Tabla Prices y Users verificada/creada");
   } catch (error) {
     console.error("❌ Error creando tabla:", error);
   }
