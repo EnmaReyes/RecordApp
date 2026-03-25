@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { pool } from "./config/db.js";
-import priceRoutes from "./routes/routesPrices.js";
+import routes from "./routes/routes.js";
 import { initDB } from "./config/db.js";
 
 dotenv.config();
@@ -22,7 +22,7 @@ app.use(
 app.use(express.json());
 
 /* ---------- Routes ---------- */
-app.use("/prices", priceRoutes);
+app.use("/prices", routes);
 
 /* ---------- Health check ---------- */
 app.get("/", async (req, res) => {
