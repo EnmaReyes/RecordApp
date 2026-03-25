@@ -1,5 +1,24 @@
 import { pool } from "../config/db.js";
 
+export const createPricesTable = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS prices_by_fiat (
+        id SERIAL PRIMARY KEY,
+        fiat VARCHAR(10) UNIQUE NOT NULL,
+        buy_price NUMERIC,
+        sell_price NUMERIC,
+        buy_methods JSONB,
+        sell_methods JSONB,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log("✅ Tabla prices_by_fiat verificada/creada");
+  } catch (error) {
+    console.error("❌ Error creando tabla prices_by_fiat:", error);
+  }
+};
+
 export const PricesModel = {
   async getAll() {
     const result = await pool.query(

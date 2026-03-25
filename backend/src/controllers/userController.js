@@ -1,45 +1,50 @@
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
-import { pool } from "../config/db.js";
+import { UserModel } from "../models/User.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Lista blanca de admins
-const allowedAdmins = ["record.cambios@gmail.com", "Inversionesfranirs@gmail.com"];
+const allowedAdmins = [
+  "record.cambios@gmail.com",
+  "Inversionesfranirs@gmail.com",
+];
 
 export const googleAuthController = async (req, res) => {
   const { token } = req.body;
 
   try {
+    // Verificar token de Google
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
- 
+
     const payload = ticket.getPayload();
     const email = payload.email;
 
-    // Buscar usuario
-    let result = await pool.query("SELECT * FROM users WHERE email=$1", [
-      email,
-    ]);
-    let user = result.rows[0];
+    // Buscar usuario por email
+    let user = await UserModel.getByEmail(email);
 
-    // Crear si no existe
+    // Crear o actualizar según corresponda
     if (!user) {
       const role = allowedAdmins.includes(email) ? "admin" : "user";
-      const insert = await pool.query(
-        `INSERT INTO users (email, company_name, first_name, last_name, role)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [
-          email,
-          payload.hd || "RecordApp",
-          payload.given_name,
-          payload.family_name,
-          role,
-        ],
-      );
-      user = insert.rows[0];
+      user = await UserModel.create({
+        email,
+        companyName: payload.hd || "RecordApp",
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        role,
+      });
+    } else {
+      // Upsert para actualizar datos si cambian
+      user = await UserModel.upsert({
+        email,
+        companyName: payload.hd || "RecordApp",
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        role: allowedAdmins.includes(email) ? "admin" : user.role,
+      });
     }
 
     // Generar JWT con rol
