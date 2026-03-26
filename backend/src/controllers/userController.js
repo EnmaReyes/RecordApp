@@ -1,13 +1,16 @@
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { UserModel } from "../models/User.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Lista blanca de admins
 const allowedAdmins = [
   "record.cambios@gmail.com",
   "Inversionesfranirs@gmail.com",
+  "gionayrangel@gmail.com",
 ];
 
 export const googleAuthController = async (req, res) => {
