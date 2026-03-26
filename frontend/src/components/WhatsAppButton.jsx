@@ -28,7 +28,7 @@ export default function WhatsAppButton({ rates }) {
       rates.URU?.toFixed(2) || "-"
     } 
 
-🇻🇪 a 🇺🇸: ${rates.USD?.toFixed(2) || "-"}     |    🇻🇪 a 🇨🇴: ${
+🇺🇸 a 🇻🇪: ${rates.USD?.toFixed(2) || "-"}     |    🇻🇪 a 🇨🇴: ${
       rates.VEN_COL?.toFixed(2) || "-"
     }   
  

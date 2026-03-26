@@ -7,6 +7,7 @@ import Filter from "./components/Filter";
 import { ToastContainer } from "react-toastify";
 import { useCurrencies } from "./context/CurrencyProvider";
 import { ExchangeCalculator } from "./components/Calculator/ExchangeCalculator";
+import GoogleLoginButton from "./components/GoogleLogin/GoogleLoginButton.jsx";
 
 const Home = () => {
   const { fetchData, loading, updateOneFiatApi } = useCurrencies();
@@ -30,6 +31,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
+        <Route path="/login" element={<GoogleLoginButton />} />
         <Route index element={<Home />} />
         <Route path="calculator" element={<ExchangeCalculator />} />
       </Route>

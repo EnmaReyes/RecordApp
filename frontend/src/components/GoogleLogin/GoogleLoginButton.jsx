@@ -1,37 +1,32 @@
-import { useEffect, useRef, useContext } from "react";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { useContext } from "react";
 import axios from "axios";
 import { useCurrencies } from "../../context/CurrencyProvider.jsx";
 
 const GoogleLoginButton = () => {
   const { login } = useCurrencies();
-  const buttonRef = useRef(null);
-
-  useEffect(() => {
-    if (!buttonRef.current) return;
-
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-    });
-
-    window.google.accounts.id.renderButton(buttonRef.current, {
-      theme: "outline",
-      size: "large",
-    });
-  }, []);
-
-  const handleCredentialResponse = async (response) => {
-    const token = response.credential;
-    try {
-      const { data } = await axios.post("/api/auth/google", { token });
-      login(data.token, data.role);
-      alert(`✅ Login exitoso como ${data.role}`);
-    } catch {
-      alert("❌ Acceso restringido");
-    }
-  };
-
-  return <div ref={buttonRef} className="flex justify-center"></div>;
+  const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const BASE_URL = import.meta.env.VITE_URLDB;
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+          try {
+            const res = await axios.post(`${BASE_URL}auth/google`, {
+              token: credentialResponse.credential,
+            });
+            login(res.data.token, res.data.role);
+            alert(`✅ Login exitoso como ${res.data.role}`);
+          } catch {
+            alert("❌ Acceso restringido");
+          }
+        }}
+        onError={() => {
+          alert("❌ Error en login con Google");
+        }}
+      />
+    </GoogleOAuthProvider>
+  );
 };
 
 export default GoogleLoginButton;
