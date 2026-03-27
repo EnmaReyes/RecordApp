@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { pool } from "./config/db.js";
 import routes from "./routes/routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import { initDB } from "./config/db.js";
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(express.json());
 /* ---------- Routes ---------- */
 app.use("/prices", routes);
 
+app.use("/api", authRoutes);
 /* ---------- Health check ---------- */
 app.get("/", async (req, res) => {
   try {
