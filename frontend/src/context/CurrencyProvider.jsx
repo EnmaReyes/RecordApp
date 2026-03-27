@@ -62,11 +62,11 @@ export const CurrencyProvider = ({ children }) => {
   const updateOneFiatApi = async (fiat) => {
     try {
       // ✅ URL correcta con param dinámico
-      await axios.get(`${apiUrl}${fiat}`, {
+      await axios.get(`${apiUrl}/${fiat}`, {
         headers: { "Cache-Control": "no-cache" },
       });
 
-      const response = await axios.get(`${urlDB}${fiat}`);
+      const response = await axios.get(`${urlDB}/${fiat}`);
       const raw = response.data.data || response.data;
 
       const normalized = normalizeCurrency(raw);
