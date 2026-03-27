@@ -17,7 +17,4 @@ router.get("/update/:fiat", getPriceByFiat);
 router.get("/", getDBPrices);
 router.get("/:fiat", getDBPriceByFiat);
 
-// Users
-router.post("/auth/google", (req, res) => googleAuthController(req, res));
-
 export default router;
