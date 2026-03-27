@@ -31,7 +31,6 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/login" element={<GoogleLoginButton />} />
         <Route index element={<Home />} />
         <Route path="calculator" element={<ExchangeCalculator />} />
       </Route>

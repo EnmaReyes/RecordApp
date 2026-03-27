@@ -2,6 +2,7 @@ import React from "react";
 import "../App.css";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useCurrencies } from "../context/CurrencyProvider.jsx";
+import GoogleLoginButton from "./GoogleLogin/GoogleLoginButton.jsx";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -67,12 +68,7 @@ export default function Header() {
             </button>
           </>
         ) : (
-          <a
-            href="/login"
-            className="bg-green-500 px-3 py-1 rounded hover:bg-green-700"
-          >
-            Login
-          </a>
+          <GoogleLoginButton />
         )}
       </div>
     </header>
