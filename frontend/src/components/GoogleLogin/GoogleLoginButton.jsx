@@ -1,6 +1,6 @@
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { useCurrencies } from "../../context/CurrencyProvider.jsx";
+import { useCurrencies } from "../../context/CurrencyProvider";
 
 const GoogleLoginButton = () => {
   const { login } = useCurrencies();
@@ -9,18 +9,22 @@ const GoogleLoginButton = () => {
 
   return (
     <GoogleLogin
+      type="icon"
+      theme="filled_blue"
+      size="medium"
+      shape="pill"
       onSuccess={async (credentialResponse) => {
         try {
-          // Este es el ID token real de Google
           const googleToken = credentialResponse.credential;
 
-          // Lo envías al backend
           const res = await axios.post(`${BASE_URL}/api/auth/google`, {
             token: googleToken,
           });
+          console.log("Data del post: ", res.data);
 
-          // El backend responde con tu JWT y rol
-          login(res.data.token, res.data.role);
+          // ✅ Pasamos todo el objeto res.data
+          login(res.data);
+
           alert(`✅ Login exitoso como ${res.data.role}`);
         } catch (err) {
           console.error(err);
