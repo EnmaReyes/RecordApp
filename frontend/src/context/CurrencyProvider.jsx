@@ -29,7 +29,11 @@ export const CurrencyProvider = ({ children }) => {
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
     const role = localStorage.getItem("role");
-    return token ? { token, role } : null;
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
+    const photo = localStorage.getItem("photo");
+
+    return token ? { token, role, firstName, lastName, photo } : null;
   });
 
   const fiatOrder = [
@@ -148,15 +152,23 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   // 🔐 Login/Logout
-  const login = (token, role) => {
-    localStorage.setItem("jwt", token);
-    localStorage.setItem("role", role);
-    setAuth({ token, role });
-  };
+ const login = ({ token, role, firstName, lastName, photo }) => {
+  localStorage.setItem("jwt", token);
+  localStorage.setItem("role", role);
+  localStorage.setItem("firstName", firstName);
+  localStorage.setItem("lastName", lastName);
+  localStorage.setItem("photo", photo);
+
+  setAuth({ token, role, firstName, lastName, photo });
+};
+
 
   const logout = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("role");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("photo");
     setAuth(null);
   };
 
