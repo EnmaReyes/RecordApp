@@ -1,6 +1,7 @@
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useCurrencies } from "../../context/CurrencyProvider";
+import { toast } from "react-toastify";
 
 const GoogleLoginButton = () => {
   const { login } = useCurrencies();
@@ -11,7 +12,7 @@ const GoogleLoginButton = () => {
     <GoogleLogin
       type="icon"
       theme="filled_blue"
-      size="medium"
+      size="large"
       shape="pill"
       onSuccess={async (credentialResponse) => {
         try {
@@ -25,14 +26,29 @@ const GoogleLoginButton = () => {
           // ✅ Pasamos todo el objeto res.data
           login(res.data);
 
-          alert(`✅ Login exitoso como ${res.data.role}`);
+          toast.success(
+            `Bienvenido ${res.data.role?.toUpperCase()} ${res.data.firstName} ${res.data.lastName}!`,
+            {
+              position: "top-center",
+              theme: "dark",
+              autoClose: 1000,
+            },
+          );
         } catch (err) {
           console.error(err);
-          alert("❌ Acceso restringido");
+          toast.error("❌ Error en login con Google", {
+            position: "top-center",
+            theme: "dark",
+            autoClose: 1000,
+          });
         }
       }}
       onError={() => {
-        alert("❌ Error en login con Google");
+        toast.error("❌ Error en login con Google", {
+          position: "top-center",
+          theme: "dark",
+          autoClose: 900,
+        });
       }}
     />
   );

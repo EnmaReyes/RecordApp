@@ -134,7 +134,7 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 📱 Media Query helper
+  // 📱 Media Query helper para verificar tamaño de panatlla
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches,
@@ -152,16 +152,15 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   // 🔐 Login/Logout
- const login = ({ token, role, firstName, lastName, photo }) => {
-  localStorage.setItem("jwt", token);
-  localStorage.setItem("role", role);
-  localStorage.setItem("firstName", firstName);
-  localStorage.setItem("lastName", lastName);
-  localStorage.setItem("photo", photo);
+  const login = ({ token, role, firstName, lastName, photo }) => {
+    localStorage.setItem("jwt", token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("firstName", firstName);
+    localStorage.setItem("lastName", lastName);
+    localStorage.setItem("photo", photo);
 
-  setAuth({ token, role, firstName, lastName, photo });
-};
-
+    setAuth({ token, role, firstName, lastName, photo });
+  };
 
   const logout = () => {
     localStorage.removeItem("jwt");

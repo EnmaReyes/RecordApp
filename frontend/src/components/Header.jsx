@@ -29,7 +29,7 @@ export default function Header() {
             <p className="text-xs text-slate-500">Cambios de divisas</p>
           </div>
         </div>
-        <nav className="hidden md:flex gap-4 items-right">
+        <nav className="hidden md:flex justify-end gap-4 items-center">
           <button
             className="text-white hover:text-primary textanimate"
             onClick={() => goToSection("inicio")}
@@ -54,8 +54,9 @@ export default function Header() {
           >
             Calculador
           </button>
+
+          <LogoLogin />
         </nav>
-        <LogoLogin />
       </div>
     </header>
   );
