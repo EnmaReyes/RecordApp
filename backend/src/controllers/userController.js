@@ -35,7 +35,7 @@ export const googleAuthController = async (req, res) => {
 
       user = await UserModel.create({
         email,
-        companyName: payload.hd || "RecordApp",
+        companyName: role === "admin" ? payload.hd || "RecordApp" : null,
         firstName: payload.given_name || firstName,
         lastName: payload.family_name || lastName,
         photo: payload.picture,
@@ -44,7 +44,8 @@ export const googleAuthController = async (req, res) => {
     } else {
       user = await UserModel.upsert({
         email,
-        companyName: payload.hd || "RecordApp",
+        companyName:
+          user.role === "admin" ? payload.hd || "RecordApp" : user.company_name,
         firstName: payload.given_name || firstName,
         lastName: payload.family_name || lastName,
         photo: payload.picture || user.photo,
@@ -61,14 +62,44 @@ export const googleAuthController = async (req, res) => {
     return res.json({
       token: appToken,
       role: user.role,
-      firstName: payload.given_name || firstName,
-      lastName: payload.family_name || lastName,
-      photo: payload.picture,
-      companyName: payload.hd || "RecordApp",
-      email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      photo: user.photo,
+      companyName: user.companyName,
+      email: user.email,
     });
   } catch (err) {
     console.error("❌ Error en Google Auth:", err);
     return res.status(401).json({ error: "Token inválido" });
+  }
+};
+
+// Editar datos de usuario
+export const updateUserController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, photo, companyName } = req.body;
+
+    // Solo admin o user pueden modificar
+    if (req.user.role !== "admin" && req.user.role !== "user") {
+      return res.status(403).json({ error: "No autorizado" });
+    }
+
+    // Si es user, no puede modificar companyName
+    const dataToUpdate =
+      req.user.role === "user"
+        ? { firstName, lastName, photo }
+        : { firstName, lastName, photo, companyName };
+
+    const updatedUser = await UserModel.updateUser(id, dataToUpdate);
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    return res.json(updatedUser);
+  } catch (err) {
+    console.error("❌ Error al actualizar datos del usuario:", err);
+    return res.status(500).json({ error: "Error interno" });
   }
 };
