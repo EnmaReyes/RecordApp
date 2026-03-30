@@ -32,8 +32,12 @@ export const CurrencyProvider = ({ children }) => {
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
     const photo = localStorage.getItem("photo");
+    const companyName = localStorage.getItem("companyName");
+    const email = localStorage.getItem("email");
 
-    return token ? { token, role, firstName, lastName, photo } : null;
+    return token
+      ? { token, role, firstName, lastName, photo, companyName, email }
+      : null;
   });
 
   const fiatOrder = [
@@ -152,14 +156,24 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   // 🔐 Login/Logout
-  const login = ({ token, role, firstName, lastName, photo }) => {
+  const login = ({
+    token,
+    role,
+    firstName,
+    lastName,
+    photo,
+    companyName,
+    email,
+  }) => {
     localStorage.setItem("jwt", token);
     localStorage.setItem("role", role);
     localStorage.setItem("firstName", firstName);
     localStorage.setItem("lastName", lastName);
     localStorage.setItem("photo", photo);
+    localStorage.setItem("companyName", companyName || "Record");
+    localStorage.setItem("email", email || "");
 
-    setAuth({ token, role, firstName, lastName, photo });
+    setAuth({ token, role, firstName, lastName, photo, companyName, email });
   };
 
   const logout = () => {
@@ -168,6 +182,8 @@ export const CurrencyProvider = ({ children }) => {
     localStorage.removeItem("firstName");
     localStorage.removeItem("lastName");
     localStorage.removeItem("photo");
+    localStorage.removeItem("companyName");
+    localStorage.removeItem("email");
     setAuth(null);
   };
 
