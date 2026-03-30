@@ -52,13 +52,14 @@ const LogoLogin = () => {
   transform transition-all duration-300 ease-in-out
   ${open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"}`}
       >
-        <div className="flex flex-row justify-start items-center gap-1 mb-4">
-          <p className="font-mono">Hola Hola!</p>
+        {/* Saludo */}
+        <div className="flex items-center gap-2 mb-4">
+          <p className="font-mono text-sm text-white/70">Hola Hola!</p>
           <p className="text-2xl">👋</p>
         </div>
 
-        {/* Header con foto y datos */}
-        <div className="flex items-center gap-3 mb-4 font-mono ">
+        {/* Header con foto y nombre */}
+        <div className="flex items-center gap-3 mb-4">
           {auth?.photo ? (
             <img
               src={auth?.photo}
@@ -74,13 +75,28 @@ const LogoLogin = () => {
             <p className="text-sm font-semibold text-white truncate">
               {auth?.firstName} {auth?.lastName}
             </p>
-            <p className="text-xs text-white/60 truncate">{auth?.role?.toUpperCase()}</p>
-            <p className="text-xs text-white/60 truncate">{auth?.email}</p>
+            <p className="text-xs text-white/60 truncate">
+              {auth?.role?.toUpperCase()}
+            </p>
           </div>
         </div>
 
+        {/* Info del usuario responsiva */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 text-xs">
+          <span className="text-white/70">Email</span>
+          <span className="text-white truncate">{auth?.email}</span>
+
+          <span className="text-white/70">Empresa</span>
+          <span className="text-white truncate">{auth?.companyName}</span>
+
+          <span className="text-white/70">Rol</span>
+          <span className="text-white truncate">
+            {auth?.role.toUpperCase()}
+          </span>
+        </div>
+
         {/* Botones de acción */}
-        <div className="flex flex-col gap-2 cursor-pointer">
+        <div className="flex flex-col gap-2 mt-4 cursor-pointer">
           <button
             onClick={() => {
               logout();
@@ -97,7 +113,6 @@ const LogoLogin = () => {
             <div className="hidden md:block">
               <RiArrowUpWideFill />
             </div>
-
             <div className="block md:hidden">
               <RiArrowDownWideFill className="text-sm" />
             </div>
