@@ -2,16 +2,18 @@ import { useState } from "react";
 import { useCurrencies } from "../../context/CurrencyProvider.jsx";
 import GoogleLoginButton from "./GoogleLoginButton.jsx";
 import { RiArrowDownWideFill, RiArrowUpWideFill } from "react-icons/ri";
+import EditUserModal from "./EditUserModal.jsx";
 
 const LogoLogin = () => {
   const { auth, logout, useMediaQuery } = useCurrencies();
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+
   const handleOpen = () => {
     setOpen((prev) => !prev);
   };
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  console.log("user: ", auth);
   return (
     <div className="flex flex-row items-center relative">
       {auth ? (
@@ -107,18 +109,19 @@ const LogoLogin = () => {
             Cerrar sesión
           </button>
           <button
-            onClick={handleOpen}
-            className="w-full bg-neutral-700/80 hover:bg-neutral-600 text-white px-3 py-2 rounded-md text-sm flex items-center justify-center gap-1 transition-colors"
+            onClick={() => {
+              setEditOpen(true);
+              setOpen(false);
+            }}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm flex items-center justify-center gap-2 transition-colors"
           >
-            <div className="hidden md:block">
-              <RiArrowUpWideFill />
-            </div>
-            <div className="block md:hidden">
-              <RiArrowDownWideFill className="text-sm" />
-            </div>
+            Editar perfil
           </button>
         </div>
       </div>
+      {editOpen && (
+        <EditUserModal user={auth} onClose={() => setEditOpen(false)} />
+      )}
     </div>
   );
 };
