@@ -64,6 +64,8 @@ export const googleAuthController = async (req, res) => {
       firstName: payload.given_name || firstName,
       lastName: payload.family_name || lastName,
       photo: payload.picture,
+      companyName: payload.hd || "RecordApp",
+      email,
     });
   } catch (err) {
     console.error("❌ Error en Google Auth:", err);
