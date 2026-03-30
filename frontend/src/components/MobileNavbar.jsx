@@ -4,6 +4,7 @@ import { BsCurrencyExchange } from "react-icons/bs";
 import { PiCurrencyDollarSimpleFill } from "react-icons/pi";
 import { IoCalculator } from "react-icons/io5";
 import { useLocation, useNavigate } from "react-router-dom";
+import LogoLogin from "./GoogleLogin/LogoLogin";
 
 const items = [
   {
@@ -75,8 +76,8 @@ export default function MobileNavbar() {
 
         {/* Logo centrado */}
         <div className="sticky -translate-y-1/2 left-1/2 transform -translate-x-1/2">
-          <div className="w-16 h-16 rounded-full bg-aqua-gradient flex items-center justify-center text-dark font-bold text-3xl shadow-lg shadow-cyan-500/30">
-            R
+          <div>
+            <LogoLogin />
           </div>
         </div>
 
