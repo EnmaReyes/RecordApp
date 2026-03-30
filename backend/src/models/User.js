@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   company_name VARCHAR(255),
   first_name VARCHAR(255),
   last_name VARCHAR(255),
+  photo TEXT,
   role VARCHAR(50) NOT NULL DEFAULT 'user',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -29,15 +30,16 @@ export const UserModel = {
     companyName,
     firstName,
     lastName,
+    photo,
     role = "user",
   }) {
     const result = await pool.query(
       `
-      INSERT INTO users (email, password, company_name, first_name, last_name, role, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+      INSERT INTO users (email, password, company_name, first_name, last_name, photo, role, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
       RETURNING *
       `,
-      [email, password, companyName, firstName, lastName, role],
+      [email, password, companyName, firstName, lastName, photo, role],
     );
     return result.rows[0];
   },
@@ -49,22 +51,24 @@ export const UserModel = {
     companyName,
     firstName,
     lastName,
+    photo,
     role = "user",
   }) {
     const result = await pool.query(
       `
-      INSERT INTO users (email, password, company_name, first_name, last_name, role, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+      INSERT INTO users (email, password, company_name, first_name, last_name, photo, role, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
       ON CONFLICT (email)
       DO UPDATE SET
         password = EXCLUDED.password,
         company_name = EXCLUDED.company_name,
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name,
+        photo = EXCLUDED.photo,
         role = EXCLUDED.role
       RETURNING *
       `,
-      [email, password, companyName, firstName, lastName, role],
+      [email, password, companyName, firstName, lastName, photo, role],
     );
     return result.rows[0];
   },
@@ -72,7 +76,7 @@ export const UserModel = {
   // Actualizar un usuario por id
   async update(
     id,
-    { email, password, companyName, firstName, lastName, role },
+    { email, password, companyName, firstName, lastName, photo, role },
   ) {
     const result = await pool.query(
       `
@@ -82,11 +86,12 @@ export const UserModel = {
           company_name = COALESCE($4, company_name),
           first_name = COALESCE($5, first_name),
           last_name = COALESCE($6, last_name),
-          role = COALESCE($7, role)
+          photo = COALESCE($7, photo),
+          role = COALESCE($8, role)
       WHERE id = $1
       RETURNING *
       `,
-      [id, email, password, companyName, firstName, lastName, role],
+      [id, email, password, companyName, firstName, lastName, photo, role],
     );
     return result.rows[0];
   },

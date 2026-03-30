@@ -1,37 +1,57 @@
-import { useEffect, useRef, useContext } from "react";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { useCurrencies } from "../../context/CurrencyProvider.jsx";
+import { useCurrencies } from "../../context/CurrencyProvider";
+import { toast } from "react-toastify";
 
 const GoogleLoginButton = () => {
   const { login } = useCurrencies();
-  const buttonRef = useRef(null);
 
-  useEffect(() => {
-    if (!buttonRef.current) return;
+  const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    window.google.accounts.id.initialize({
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-    });
+  return (
+    <GoogleLogin
+      type="icon"
+      theme="filled_blue"
+      size="large"
+      shape="pill"
+      onSuccess={async (credentialResponse) => {
+        try {
+          const googleToken = credentialResponse.credential;
 
-    window.google.accounts.id.renderButton(buttonRef.current, {
-      theme: "outline",
-      size: "large",
-    });
-  }, []);
+          const res = await axios.post(`${BASE_URL}/api/auth/google`, {
+            token: googleToken,
+          });
+          console.log("Data del post: ", res.data);
 
-  const handleCredentialResponse = async (response) => {
-    const token = response.credential;
-    try {
-      const { data } = await axios.post("/api/auth/google", { token });
-      login(data.token, data.role);
-      alert(`✅ Login exitoso como ${data.role}`);
-    } catch {
-      alert("❌ Acceso restringido");
-    }
-  };
+          // ✅ Pasamos todo el objeto res.data
+          login(res.data);
 
-  return <div ref={buttonRef} className="flex justify-center"></div>;
+          toast.success(
+            `Bienvenido ${res.data.role?.toUpperCase()} ${res.data.firstName} ${res.data.lastName}!`,
+            {
+              position: "top-center",
+              theme: "dark",
+              autoClose: 1000,
+            },
+          );
+        } catch (err) {
+          console.error(err);
+          toast.error("❌ Error en login con Google", {
+            position: "top-center",
+            theme: "dark",
+            autoClose: 1000,
+          });
+        }
+      }}
+      onError={() => {
+        toast.error("❌ Error en login con Google", {
+          position: "top-center",
+          theme: "dark",
+          autoClose: 900,
+        });
+      }}
+    />
+  );
 };
 
 export default GoogleLoginButton;

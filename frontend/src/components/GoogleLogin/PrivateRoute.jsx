@@ -5,7 +5,7 @@ import { useCurrencies } from "../../context/CurrencyProvider.jsx";
 const PrivateRoute = ({ children, requiredRole }) => {
   const { auth } = useCurrencies();
 
-  if (!auth) return <Navigate to="/login" />;
+  if (!auth) return <Navigate to="/" />;
   if (requiredRole && auth.role !== requiredRole) return <Navigate to="/" />;
 
   return children;

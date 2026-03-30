@@ -29,7 +29,15 @@ export const CurrencyProvider = ({ children }) => {
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
     const role = localStorage.getItem("role");
-    return token ? { token, role } : null;
+    const firstName = localStorage.getItem("firstName");
+    const lastName = localStorage.getItem("lastName");
+    const photo = localStorage.getItem("photo");
+    const companyName = localStorage.getItem("companyName");
+    const email = localStorage.getItem("email");
+
+    return token
+      ? { token, role, firstName, lastName, photo, companyName, email }
+      : null;
   });
 
   const fiatOrder = [
@@ -62,11 +70,11 @@ export const CurrencyProvider = ({ children }) => {
   const updateOneFiatApi = async (fiat) => {
     try {
       // ✅ URL correcta con param dinámico
-      await axios.get(`${apiUrl}${fiat}`, {
+      await axios.get(`${apiUrl}/${fiat}`, {
         headers: { "Cache-Control": "no-cache" },
       });
 
-      const response = await axios.get(`${urlDB}${fiat}`);
+      const response = await axios.get(`${urlDB}/${fiat}`);
       const raw = response.data.data || response.data;
 
       const normalized = normalizeCurrency(raw);
@@ -130,7 +138,7 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 📱 Media Query helper
+  // 📱 Media Query helper para verificar tamaño de panatlla
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches,
@@ -148,15 +156,34 @@ export const CurrencyProvider = ({ children }) => {
   };
 
   // 🔐 Login/Logout
-  const login = (token, role) => {
+  const login = ({
+    token,
+    role,
+    firstName,
+    lastName,
+    photo,
+    companyName,
+    email,
+  }) => {
     localStorage.setItem("jwt", token);
     localStorage.setItem("role", role);
-    setAuth({ token, role });
+    localStorage.setItem("firstName", firstName);
+    localStorage.setItem("lastName", lastName);
+    localStorage.setItem("photo", photo);
+    localStorage.setItem("companyName", companyName || "Record");
+    localStorage.setItem("email", email || "");
+
+    setAuth({ token, role, firstName, lastName, photo, companyName, email });
   };
 
   const logout = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("role");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("photo");
+    localStorage.removeItem("companyName");
+    localStorage.removeItem("email");
     setAuth(null);
   };
 
