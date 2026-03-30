@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { calcSpread } from "../utils/calcs.js";
+
 const CurrencyContext = createContext();
 export const useCurrencies = () => useContext(CurrencyContext);
 
@@ -10,13 +11,10 @@ export const useCurrencies = () => useContext(CurrencyContext);
 const normalizeCurrency = (item) => ({
   id: item.id,
   fiat: item.fiat,
-
   buyPrice: item.buy_price,
   sellPrice: item.sell_price,
-
   buyMethods: item.buy_methods || [],
   sellMethods: item.sell_methods || [],
-
   createdAt: item.created_at,
   updatedAt: item.updated_at,
 });
@@ -24,8 +22,11 @@ const normalizeCurrency = (item) => ({
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
   const urlDB = import.meta.env.VITE_URLDB; // /prices
+  const BaseUrl = import.meta.env.VITE_BASE_URL; // http://localhost:3000/
+  // 🔐 Estado de autenticación
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
     const role = localStorage.getItem("role");
@@ -58,9 +59,7 @@ export const CurrencyProvider = ({ children }) => {
   // 🔄 Actualiza DB desde API externa
   const updateFromApi = async () => {
     try {
-      await axios.get(apiUrl, {
-        headers: { "Cache-Control": "no-cache" },
-      });
+      await axios.get(apiUrl, { headers: { "Cache-Control": "no-cache" } });
     } catch (error) {
       console.error("❌ Error updating currencies from API:", error);
     }
@@ -69,14 +68,12 @@ export const CurrencyProvider = ({ children }) => {
   // 🔄 Actualiza UN fiat
   const updateOneFiatApi = async (fiat) => {
     try {
-      // ✅ URL correcta con param dinámico
       await axios.get(`${apiUrl}/${fiat}`, {
         headers: { "Cache-Control": "no-cache" },
       });
 
       const response = await axios.get(`${urlDB}/${fiat}`);
       const raw = response.data.data || response.data;
-
       const normalized = normalizeCurrency(raw);
 
       const updated = {
@@ -91,7 +88,6 @@ export const CurrencyProvider = ({ children }) => {
             (a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat),
           ),
       );
-      timesUP();
     } catch (error) {
       console.error(`❌ Error updating ${fiat}:`, error);
     }
@@ -138,7 +134,7 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 📱 Media Query helper para verificar tamaño de panatlla
+  // 📱 Media Query helper
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches,
@@ -155,7 +151,7 @@ export const CurrencyProvider = ({ children }) => {
     return matches;
   };
 
-  // 🔐 Login/Logout
+  // 🔐 Login
   const login = ({
     token,
     role,
@@ -170,12 +166,13 @@ export const CurrencyProvider = ({ children }) => {
     localStorage.setItem("firstName", firstName);
     localStorage.setItem("lastName", lastName);
     localStorage.setItem("photo", photo);
-    localStorage.setItem("companyName", companyName || "Record");
+    localStorage.setItem("companyName", companyName || "");
     localStorage.setItem("email", email || "");
 
     setAuth({ token, role, firstName, lastName, photo, companyName, email });
   };
 
+  // 🔐 Logout
   const logout = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("role");
@@ -185,6 +182,48 @@ export const CurrencyProvider = ({ children }) => {
     localStorage.removeItem("companyName");
     localStorage.removeItem("email");
     setAuth(null);
+  };
+
+  // ✏️ Actualizar datos de usuario (admin o user)
+  const updateUser = async (id, updatedData) => {
+    try {
+      const response = await axios.patch(
+        `${BaseUrl}/users/${id}`,
+        updatedData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        },
+      );
+
+      const data = response.data;
+
+      // Actualizamos localStorage
+      localStorage.setItem("firstName", data.first_name);
+      localStorage.setItem("lastName", data.last_name);
+      localStorage.setItem("photo", data.photo);
+      localStorage.setItem("companyName", data.company_name || "");
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("email", data.email);
+
+      // Actualizamos estado global
+      setAuth({
+        token: auth.token,
+        role: data.role,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        photo: data.photo,
+        companyName: data.company_name,
+        email: data.email,
+      });
+
+      return data;
+    } catch (error) {
+      console.error("❌ Error actualizando usuario:", error);
+      throw error;
+    }
   };
 
   return (
@@ -198,6 +237,7 @@ export const CurrencyProvider = ({ children }) => {
         auth,
         login,
         logout,
+        updateUser, // 👈 expuesto al frontend
       }}
     >
       {children}
