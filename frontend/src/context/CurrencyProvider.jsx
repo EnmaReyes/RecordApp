@@ -25,10 +25,11 @@ export const CurrencyProvider = ({ children }) => {
 
   const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
   const urlDB = import.meta.env.VITE_URLDB; // /prices
-  const BaseUrl = import.meta.env.VITE_BASE_URL; // http://localhost:3000/
+  const BaseUrl = import.meta.env.VITE_BASE_URL; // http://localhost:3000
   // 🔐 Estado de autenticación
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
+    const id = localStorage.getItem("id");
     const role = localStorage.getItem("role");
     const firstName = localStorage.getItem("firstName");
     const lastName = localStorage.getItem("lastName");
@@ -37,7 +38,7 @@ export const CurrencyProvider = ({ children }) => {
     const email = localStorage.getItem("email");
 
     return token
-      ? { token, role, firstName, lastName, photo, companyName, email }
+      ? { token, id, role, firstName, lastName, photo, companyName, email }
       : null;
   });
 
@@ -154,6 +155,7 @@ export const CurrencyProvider = ({ children }) => {
   // 🔐 Login
   const login = ({
     token,
+    id,
     role,
     firstName,
     lastName,
@@ -162,6 +164,7 @@ export const CurrencyProvider = ({ children }) => {
     email,
   }) => {
     localStorage.setItem("jwt", token);
+    localStorage.setItem("id", id);
     localStorage.setItem("role", role);
     localStorage.setItem("firstName", firstName);
     localStorage.setItem("lastName", lastName);
@@ -169,12 +172,22 @@ export const CurrencyProvider = ({ children }) => {
     localStorage.setItem("companyName", companyName || "");
     localStorage.setItem("email", email || "");
 
-    setAuth({ token, role, firstName, lastName, photo, companyName, email });
+    setAuth({
+      token,
+      id,
+      role,
+      firstName,
+      lastName,
+      photo,
+      companyName,
+      email,
+    });
   };
 
   // 🔐 Logout
   const logout = () => {
     localStorage.removeItem("jwt");
+    localStorage.removeItem("id");
     localStorage.removeItem("role");
     localStorage.removeItem("firstName");
     localStorage.removeItem("lastName");
@@ -188,7 +201,7 @@ export const CurrencyProvider = ({ children }) => {
   const updateUser = async (id, updatedData) => {
     try {
       const response = await axios.patch(
-        `${BaseUrl}/users/${id}`,
+        `${BaseUrl}/api/users/${id}`,
         updatedData,
         {
           headers: {
@@ -200,22 +213,24 @@ export const CurrencyProvider = ({ children }) => {
 
       const data = response.data;
 
-      // Actualizamos localStorage
+      // Actualizamos localStorage con los valores normalizados
       localStorage.setItem("firstName", data.first_name);
       localStorage.setItem("lastName", data.last_name);
       localStorage.setItem("photo", data.photo);
       localStorage.setItem("companyName", data.company_name || "");
       localStorage.setItem("role", data.role);
       localStorage.setItem("email", data.email);
+      localStorage.setItem("id", data.id);
 
-      // Actualizamos estado global
+      // Actualizamos estado global de auth
       setAuth({
         token: auth.token,
+        id: data.id,
         role: data.role,
         firstName: data.first_name,
         lastName: data.last_name,
         photo: data.photo,
-        companyName: data.company_name,
+        companyName: data.company_name || "",
         email: data.email,
       });
 
@@ -237,7 +252,7 @@ export const CurrencyProvider = ({ children }) => {
         auth,
         login,
         logout,
-        updateUser, // 👈 expuesto al frontend
+        updateUser,
       }}
     >
       {children}
