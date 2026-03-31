@@ -3,6 +3,7 @@ import {
   googleAuthController,
   updateUserController,
 } from "../controllers/userController.js";
+import { authMiddleware } from "../middleware/adminOnly.js";
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router.post("/auth/google", (req, res) => {
 });
 
 // Ruta para actualizar datos de usuario
-router.patch("/users/:id/company", updateUserController);
+router.patch("/users/:id", authMiddleware, updateUserController);
 
 export default router;

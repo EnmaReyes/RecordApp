@@ -26,6 +26,7 @@ export const googleAuthController = async (req, res) => {
 
     const fullName = payload.name || "";
     const [firstName, ...rest] = fullName.split(" ");
+    
     const lastName = rest.join(" ");
 
     let user = await UserModel.getByEmail(email);
@@ -59,15 +60,18 @@ export const googleAuthController = async (req, res) => {
       { expiresIn: "1h" },
     );
 
-    return res.json({
+    const returnData = res.json({
       token: appToken,
       role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      firstName: user.firstName || user.first_name,
+      lastName: user.lastName || user.last_name,
       photo: user.photo,
-      companyName: user.companyName,
+      companyName: user.companyName || user.company_name,
       email: user.email,
+      id: user.id,
     });
+
+    return returnData;
   } catch (err) {
     console.error("❌ Error en Google Auth:", err);
     return res.status(401).json({ error: "Token inválido" });
@@ -85,7 +89,6 @@ export const updateUserController = async (req, res) => {
       return res.status(403).json({ error: "No autorizado" });
     }
 
-    // Si es user, no puede modificar companyName
     const dataToUpdate =
       req.user.role === "user"
         ? { firstName, lastName, photo }
