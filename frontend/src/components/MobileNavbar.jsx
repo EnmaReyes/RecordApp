@@ -73,13 +73,8 @@ export default function MobileNavbar() {
             </button>
           ))}
         </div>
-
         {/* Logo centrado */}
-        <div className="sticky -translate-y-1/2 left-1/2 transform -translate-x-1/2">
-          <div>
-            <LogoLogin />
-          </div>
-        </div>
+        <LogoLogin />
 
         {/* Bloque derecho */}
         <div className="flex gap-12">

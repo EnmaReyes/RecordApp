@@ -21,9 +21,9 @@ const GoogleLoginButton = () => {
           const res = await axios.post(`${BASE_URL}/api/auth/google`, {
             token: googleToken,
           });
+
           console.log("Data del post: ", res.data);
 
-          // ✅ Pasamos todo el objeto res.data
           login(res.data);
 
           toast.success(
