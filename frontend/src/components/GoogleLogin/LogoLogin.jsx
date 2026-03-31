@@ -13,7 +13,7 @@ const LogoLogin = () => {
     setOpen((prev) => !prev);
   };
   const isMobile = useMediaQuery("(max-width: 768px)");
-  
+
   return (
     <div className="flex flex-row items-center relative">
       {auth ? (
@@ -50,7 +50,7 @@ const LogoLogin = () => {
       )}
 
       <div
-        className={`absolute -top-60 md:top-14 -right-24 w-64 rounded-lg bg-neutral-800/5 shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur-md p-4
+        className={`absolute bottom-24 md:top-14 -right-24 w-64 rounded-lg bg-neutral-800/5 shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur-md p-4
   transform transition-all duration-300 ease-in-out
   ${open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"}`}
       >
@@ -73,11 +73,11 @@ const LogoLogin = () => {
               {auth?.firstName?.charAt(0)?.toUpperCase() || "R"}
             </div>
           )}
-          <div className="flex flex-col">
-            <p className="text-sm font-semibold text-white truncate">
+          <div className="flex flex-col w-full max-w-[200px]">
+            <p className="text-sm font-semibold text-white break-words">
               {auth?.firstName} {auth?.lastName}
             </p>
-            <p className="text-xs text-white/60 truncate">
+            <p className="text-xs text-white/60 break-words">
               {auth?.role?.toUpperCase()}
             </p>
           </div>
@@ -88,8 +88,12 @@ const LogoLogin = () => {
           <span className="text-white/70">Email</span>
           <span className="text-white truncate">{auth?.email}</span>
 
-          <span className="text-white/70">Empresa</span>
-          <span className="text-white truncate">{auth?.companyName}</span>
+          {auth?.companyName && (
+            <>
+              <span className="text-white/70">Empresa</span>
+              <span className="text-white truncate">{auth?.companyName}</span>
+            </>
+          )}
 
           <span className="text-white/70">Rol</span>
           <span className="text-white truncate">

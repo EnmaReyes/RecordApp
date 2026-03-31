@@ -43,7 +43,7 @@ const EditUserModal = ({ user, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 ">
       <div className="bg-home-gradient shadow-lg shadow-black/40 rounded-lg w-[400px] p-6 relative">
         <h2 className="text-xl font-semibold mb-4 text-center">
           Editar Perfil
