@@ -1,9 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useCurrencies } from "../context/CurrencyProvider.jsx";
 import ExchangeCard from "./ExchangeCards.jsx";
 import WhatsAppButton from "./WhatsAppButton.jsx";
 import NeonModeSwitchFlag from "./FromSwitchTo.jsx";
 import { CopyRatesButton } from "./CopyRatesButton.jsx";
+import {
+  calculateGeneral,
+  calculateCOPtoFiat,
+} from "../utils/exchangeRates.js";
 import { useCallback } from "react";
 
 const ExchangeBox = () => {
@@ -59,10 +63,45 @@ const ExchangeBox = () => {
     });
   }, []);
 
+  /* ===== Calcular rates para WhatsApp directamente ===== */
+  const calculateWhatsAppRates = useMemo(() => {
+    const getRate = (fromFiat, toFiat, margin = 0.1) => {
+      const fromCurrency = currencies.find((c) => c.fiat === fromFiat);
+      const toCurrency = currencies.find((c) => c.fiat === toFiat);
+
+      if (!fromCurrency || !toCurrency) return null;
+
+      if (fromFiat === "COP") {
+        return calculateCOPtoFiat(
+          fromCurrency.buyPrice,
+          toCurrency.sellPrice,
+          margin,
+        );
+      }
+
+      return calculateGeneral(
+        toCurrency.sellPrice,
+        fromCurrency.buyPrice,
+        margin,
+      );
+    };
+
+    return {
+      COL: getRate("COP", "VES"),
+      MEX: getRate("MXN", "VES"),
+      PER: getRate("PEN", "VES"),
+      CHL: getRate("CLP", "VES"),
+      BRA: getRate("BRL", "VES"),
+      ARG: getRate("ARS", "VES"),
+      ESP: getRate("EUR", "VES"),
+      URU: getRate("UYU", "VES"),
+      USD: getRate("USD", "VES"),
+      VEN_COL: getRate("VES", "COP"),
+    };
+  }, [currencies]);
+
   if (loading || currencies.length === 0)
     return <p className="text-center text-white">Loading...</p>;
-
-  // 🔁 Generar todas las combinaciones posibles
   const allPairs = [];
   for (const dataFrom of currencies) {
     for (const dataTo of currencies) {
@@ -79,19 +118,7 @@ const ExchangeBox = () => {
   }
 
   // extraer solo las tasas necesarias para WhatsApp
-  const ratesForWhatsApp = {
-    COL: calculatedRates.find((r) => r.from === "COP" && r.to === "VES")?.rate,
-    MEX: calculatedRates.find((r) => r.from === "MXN" && r.to === "VES")?.rate,
-    PER: calculatedRates.find((r) => r.from === "PEN" && r.to === "VES")?.rate,
-    CHL: calculatedRates.find((r) => r.from === "CLP" && r.to === "VES")?.rate,
-    BRA: calculatedRates.find((r) => r.from === "BRL" && r.to === "VES")?.rate,
-    ARG: calculatedRates.find((r) => r.from === "ARS" && r.to === "VES")?.rate,
-    ESP: calculatedRates.find((r) => r.from === "EUR" && r.to === "VES")?.rate,
-    URU: calculatedRates.find((r) => r.from === "UYU" && r.to === "VES")?.rate,
-    USD: calculatedRates.find((r) => r.from === "USD" && r.to === "VES")?.rate,
-    VEN_COL: calculatedRates.find((r) => r.from === "VES" && r.to === "COP")
-      ?.rate,
-  };
+  const ratesForWhatsApp = calculateWhatsAppRates;
 
   return (
     <div id="tasas" className="flex flex-col justify-center gap-5 w-max">
@@ -133,7 +160,7 @@ const ExchangeBox = () => {
                   sellPrice={pair.sellPrice}
                   baseBuy={pair.baseBuy}
                   baseSell={pair.baseSell}
-                  initialMargin={pair.from === "BRL" ? 7 : 10}
+                  initialMargin={pair.from === "BRL" ? 7 : 9}
                   onRateCalculated={handleRateCalculated}
                 />
               ))}
