@@ -117,27 +117,25 @@ export const Calculator = ({ from, to }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4">
+    <div className="w-full max-w-full sm:max-w-lg md:max-w-2xl mx-auto px-4">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-            Conversor de Monedas
-          </h2>
-        </div>
+      <div className="mb-4 sm:mb-6 flex items-center justify-between">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+          Conversor de Monedas
+        </h2>
       </div>
 
-      {/* UNIFIED CARD - Sin bordes internos */}
-      <div className="rounded-3xl bg-gradient-to-br from-slate-900/80 via-blue-900/60 to-slate-900/80 backdrop-blur-xl border border-cyan-400/20 overflow-hidden shadow-2xl text-white">
+      {/* Card */}
+      <div className="rounded-2xl bg-gradient-to-br from-slate-900/80 via-blue-900/60 to-slate-900/80 backdrop-blur-xl border border-cyan-400/20 shadow-2xl text-white">
         {/* ===== TOP SECTION: FROM ===== */}
-        <div className="p-6 md:p-8 border-b border-cyan-400/10 space-y-3">
+        <div className="p-4 md:p-8 border-b border-cyan-400/10 space-y-3">
           <label className="text-xs font-semibold text-cyan-300 uppercase tracking-wide block">
             Enviar
           </label>
 
           <div className="flex items-center gap-3">
             {/* Moneda Selector */}
-            <div className="relative flex-shrink-0 w-24">
+            <div className="relative flex-shrink-0 w-20 sm:w-24">
               <CurrencySelector
                 value={fromFiat}
                 currencies={currencies}
@@ -152,7 +150,7 @@ export const Calculator = ({ from, to }) => {
               placeholder="0"
               value={fromAmount}
               onChange={(e) => handleFromChange(e.target.value)}
-              className="flex-1 bg-transparent border-0 text-right text-cyan-300 placeholder-cyan-300/30 font-bold py-2 outline-none focus:text-cyan-100 text-3xl"
+              className="flex-1 min-w-0 bg-transparent border-0 text-right text-cyan-300 placeholder-cyan-300/30 font-bold py-2 outline-none focus:text-cyan-100 text-xl sm:text-2xl md:text-3xl"
             />
           </div>
 
@@ -165,18 +163,18 @@ export const Calculator = ({ from, to }) => {
         </div>
 
         {/* ===== MIDDLE SECTION: SWAP & RATE ===== */}
-        <div className="px-6 md:px-8 py-4 flex items-center justify-between border-b border-cyan-400/10">
+        <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 flex items-center justify-between border-b border-cyan-400/10 gap-2">
           <button
             onClick={handleSwap}
-            className="bg-gradient-to-r from-cyan-500/60 to-blue-500/60 hover:from-cyan-500 hover:to-blue-500 text-white px-3 py-1 rounded-full transition transform hover:scale-105 shadow-lg"
+            className="bg-gradient-to-r from-cyan-500/60 to-blue-500/60 hover:from-cyan-500 hover:to-blue-500 text-white p-2 rounded-full transition transform hover:scale-105 shadow-lg flex-shrink-0"
           >
-            <CgArrowsExchangeAltV size={28} />
+            <CgArrowsExchangeAltV size={20} className="sm:w-7 sm:h-7" />
           </button>
 
           {rate && (
-            <div className="text-center flex-1">
-              <p className="text-xs text-cyan-300/70 mb-1">Tasa</p>
-              <p className="text-xl font-bold text-cyan-300">
+            <div className="text-center flex-1 min-w-0">
+              <p className="text-xs text-cyan-300/70 mb-0.5">Tasa</p>
+              <p className="text-base sm:text-lg md:text-xl font-bold text-cyan-300">
                 {formatRate(rate)}
               </p>
             </div>
@@ -194,13 +192,13 @@ export const Calculator = ({ from, to }) => {
         </div>
 
         {/* ===== BOTTOM SECTION: TO ===== */}
-        <div className="p-6 md:p-8 space-y-3">
+        <div className="p-4 sm:p-6 md:p-8 space-y-3">
           <label className="text-xs font-semibold text-cyan-300 uppercase tracking-wide block">
             Recibir
           </label>
           <div className="flex items-center gap-3">
             {/* Moneda Selector */}
-            <div className="relative flex-shrink-0 w-24">
+            <div className="relative flex-shrink-0 w-20 sm:w-24">
               <CurrencySelector
                 value={toFiat}
                 currencies={currencies}
@@ -215,9 +213,10 @@ export const Calculator = ({ from, to }) => {
               placeholder="0"
               value={toAmount}
               onChange={(e) => handleToChange(e.target.value)}
-              className="flex-1 bg-transparent border-0 text-right text-blue-300 placeholder-blue-300/30 font-bold py-2 outline-none focus:text-blue-100 text-3xl"
+              className="flex-1 min-w-0 bg-transparent border-0 text-right text-blue-300 placeholder-blue-300/30 font-bold py-2 outline-none focus:text-blue-100 text-xl sm:text-2xl md:text-3xl"
             />
           </div>
+
           {/* Price Info */}
           {toCurrency && (
             <div className="flex text-xs text-cyan-300/60">
@@ -228,19 +227,21 @@ export const Calculator = ({ from, to }) => {
 
         {/* ===== MARGIN SECTION ===== */}
         {rate && (
-          <div className="px-6 md:px-8 py-4 border-t border-cyan-400/10 bg-white/5">
-            <div className="flex items-center justify-between mb-3">
+          <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 border-t border-cyan-400/10 bg-white/5">
+            <div className="flex items-center justify-between mb-2">
               <p className="text-xs text-cyan-300/70 font-semibold">
                 Margen Aplicado
               </p>
-              <p className="text-sm font-bold text-blue-300">{margin}%</p>
+              <p className="text-xs sm:text-sm font-bold text-blue-300">
+                {margin}%
+              </p>
             </div>
             <Marginrates margin={margin} onChangeMargin={setMargin} />
           </div>
         )}
 
         {/* Footer Info */}
-        <div className="text-xs text-cyan-300/60 text-center p-3 bg-white/5 border-t border-cyan-400/10">
+        <div className="text-xs text-cyan-300/60 text-center p-2 sm:p-3 bg-white/5 border-t border-cyan-400/10">
           Tasas actualizadas cada minuto • Operador: RecordApp Exchange
         </div>
       </div>
