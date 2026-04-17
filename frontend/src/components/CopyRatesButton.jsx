@@ -24,7 +24,7 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
 
   const handleCopy = () => {
     const filteredPairs = allPairs.filter((pair) =>
-      mode === "para" ? pair.to === baseFiat : pair.from === baseFiat
+      mode === "para" ? pair.to === baseFiat : pair.from === baseFiat,
     );
 
     const text = [
@@ -32,11 +32,11 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
       "",
       ...filteredPairs.map((pair) => {
         const rateObj = calculatedRates.find(
-          (r) => r.from === pair.from && r.to === pair.to
+          (r) => r.from === pair.from && r.to === pair.to,
         );
         const rate = rateObj?.rate ?? "N/A";
 
-        return `${pair.from} → ${pair.to} : ${formatRate(rate, 4)}`;
+        return `${pair.from} → ${pair.to} : ${formatRate(rate)}`;
       }),
     ].join("\n");
 
@@ -79,7 +79,7 @@ const CopyRatesButton = ({ baseFiat, mode, allPairs, calculatedRates }) => {
 
 const CopyRateButton = ({ from, to, rateValue }) => {
   const handleCopy = () => {
-    const text = `Tasa de: ${from} → ${to} : *${formatRate(rateValue, 4)}*`;
+    const text = `Tasa de: ${from} → ${to} : *${formatRate(rateValue)}*`;
 
     navigator.clipboard.writeText(text).then(() => {
       // Toast notification
@@ -107,4 +107,50 @@ const CopyRateButton = ({ from, to, rateValue }) => {
   );
 };
 
-export { CopyRatesButton, CopyRateButton };
+const CopyCalculatorButton = ({
+  fromAmount,
+  fromFiat,
+  toAmount,
+  toFiat,
+  rate,
+}) => {
+  const btnRef = useRef(null);
+
+  const vibrate = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+  };
+
+  const handleCopy = () => {
+    const text = `Si Envías *${fromAmount}* ${fromFiat}, Recibes *${toAmount}* ${toFiat}
+Tasa en: *${formatRate(rate)}*`;
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        toast.success("Conversión copiada", {
+          position: "bottom-center",
+          theme: "dark",
+          autoClose: 900,
+        });
+
+        vibrate();
+      })
+      .catch((e) => {
+        toast.error("Error al copiar");
+      });
+  };
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={handleCopy}
+      className={`text-xs font-semibold px-3 py-2 rounded-lg transition transform hover:scale-105 bg-cyan-500/60 text-white hover:bg-cyan-500`}
+    >
+      Copiar
+    </button>
+  );
+};
+
+export { CopyRatesButton, CopyRateButton, CopyCalculatorButton };
