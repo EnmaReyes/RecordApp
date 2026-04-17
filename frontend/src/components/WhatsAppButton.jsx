@@ -1,9 +1,6 @@
-// WhatsAppButton.jsx
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 export default function WhatsAppButton({ rates }) {
-  const phoneNumber = "5491122947537";
-
   const message = useMemo(() => {
     if (!rates) return "Un problema ocurrió al obtener las tasas de cambio.";
 
@@ -12,25 +9,15 @@ export default function WhatsAppButton({ rates }) {
          CAMBIOS RECORD 🌥
    Haz tus cambios desde
 
-🇨🇴 a 🇻🇪: ${rates.COL?.toFixed(2) || "-"}         |    🇨🇱 a 🇻🇪: ${
-      rates.CHL?.toFixed(4) || "-"
-    }
+🇨🇴 a 🇻🇪: ${rates.COL || "-"}       |    🇨🇱 a 🇻🇪: ${rates.CHL || "-"}
 
-🇲🇽 a 🇻🇪: ${rates.MEX?.toFixed(2) || "-"}       |    🇦🇷 a 🇻🇪: ${
-      rates.ARG?.toFixed(4) || "-"
-    }
+🇲🇽 a 🇻🇪: ${rates.MEX || "-"}      |    🇦🇷 a 🇻🇪: ${rates.ARG || "-"}
 
-🇵🇪 a 🇻🇪: ${rates.PER?.toFixed(2) || "-"}     |    🇧🇷 a 🇻🇪: ${
-      rates.BRA?.toFixed(2) || "-"
-    }
+🇵🇪 a 🇻🇪: ${rates.PER || "-"}     |    🇧🇷 a 🇻🇪: ${rates.BRA || "-"}
 
-🇪🇸 a 🇻🇪: ${rates.ESP?.toFixed(2) || "-"}     |    🇺🇾 a 🇻🇪: ${
-      rates.URU?.toFixed(2) || "-"
-    } 
+🇪🇸 a 🇻🇪: ${rates.ESP || "-"}     |    🇺🇾 a 🇻🇪: ${rates.URU || "-"} 
 
-🇺🇸 a 🇻🇪: ${rates.USD?.toFixed(2) || "-"}     |    🇻🇪 a 🇨🇴: ${
-      rates.VEN_COL?.toFixed(2) || "-"
-    }   
+🇺🇸 a 🇻🇪: ${rates.USD || "-"}     |    🇻🇪 a 🇨🇴: ${rates.VEN_COL || "-"}   
  
 ⚠ A considerar:
 💬 Pedir número de cuenta
