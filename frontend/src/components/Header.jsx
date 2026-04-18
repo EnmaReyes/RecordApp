@@ -2,11 +2,12 @@ import React from "react";
 import "../App.css";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import LogoLogin from "./GoogleLogin/LogoLogin.jsx";
+import { useCurrencies } from "../context/CurrencyProvider.jsx";
 
 export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const { auth, logout, useMediaQuery } = useCurrencies();
   const goToSection = (id) => {
     if (location.pathname !== "/") {
       navigate("/", { state: { scrollTo: id } });
@@ -21,11 +22,13 @@ export default function Header() {
         <div className="flex items-center gap-3 logo">
           <Link to="/" className="logo">
             <div className="w-10 h-10 rounded-lg bg-aqua-gradient flex items-center justify-center text-dark font-bold text-lg shadow-lg shadow-cyan-500/30 spin-logo">
-              R
+              {!auth ? "R" : auth?.companyName?.[0]?.toUpperCase() || "R"}
             </div>
           </Link>
           <div>
-            <h1 className="text-lg font-semibold">RECORD</h1>
+            <h1 className="text-lg font-semibold">
+              {!auth ? "RECORD" : auth?.companyName?.toUpperCase() || "RECORD"}
+            </h1>
             <p className="text-xs text-slate-500">Cambios de divisas</p>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { CopyRateButton } from "./CopyRatesButton";
 import { IoCalculator } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Marginrates from "./Marginrates.jsx";
+import { RoleGuard } from "./GoogleLogin/PrivateRoute.jsx";
 
 export default function ExchangeCard({
   from,
@@ -137,8 +138,9 @@ export default function ExchangeCard({
           {to} Sell: {formatRate(parseFloat(baseSell))}
         </p>
       </div>
-
-      <Marginrates margin={margin} onChangeMargin={setMargin} />
+      <RoleGuard allowedRoles={["admin"]}>
+        <Marginrates margin={margin} onChangeMargin={setMargin} />
+      </RoleGuard>
     </div>
   );
 }
