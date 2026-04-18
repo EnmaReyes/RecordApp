@@ -9,6 +9,7 @@ import Marginrates from "../Marginrates.jsx";
 import CurrencySelector from "../../utils/CurrencySelector.jsx";
 import { CopyCalculatorButton } from "../CopyRatesButton.jsx";
 import { CgArrowsExchangeAltV } from "react-icons/cg";
+import { RoleGuard } from "../GoogleLogin/PrivateRoute.jsx";
 /* ------------------ Utils ------------------ */
 const formatNumber = (num = 0) =>
   new Intl.NumberFormat("es-ES", {
@@ -31,7 +32,7 @@ const useDebounce = (value, delay = 200) => {
 };
 
 export const Calculator = ({ from, to }) => {
-  const { currencies } = useCurrencies();
+  const { currencies, auth } = useCurrencies();
 
   const [fromFiat, setFromFiat] = useState(from ?? "");
   const [toFiat, setToFiat] = useState(to ?? "");
@@ -226,23 +227,28 @@ export const Calculator = ({ from, to }) => {
         </div>
 
         {/* ===== MARGIN SECTION ===== */}
-        {rate && (
-          <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 border-t border-cyan-400/10 bg-white/5">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-cyan-300/70 font-semibold">
-                Margen Aplicado
-              </p>
-              <p className="text-xs sm:text-sm font-bold text-blue-300">
-                {margin}%
-              </p>
+        <RoleGuard allowedRoles={["admin"]}>
+          {rate && (
+            <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 border-t border-cyan-400/10 bg-white/5">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs text-cyan-300/70 font-semibold">
+                  Margen Aplicado
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-blue-300">
+                  {margin}%
+                </p>
+              </div>
+              <Marginrates margin={margin} onChangeMargin={setMargin} />
             </div>
-            <Marginrates margin={margin} onChangeMargin={setMargin} />
-          </div>
-        )}
+          )}
+        </RoleGuard>
 
         {/* Footer Info */}
         <div className="text-xs text-cyan-300/60 text-center p-2 sm:p-3 bg-white/5 border-t border-cyan-400/10">
-          Tasas actualizadas cada minuto • Operador: RecordApp Exchange
+          Tasas actualizadas cada minuto • Operador:{" "}
+          {!auth
+            ? "Record Exchange"
+            : auth?.companyName?.toUpperCase() || "RECORD"}
         </div>
       </div>
     </div>

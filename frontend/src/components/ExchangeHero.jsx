@@ -1,5 +1,6 @@
 import React from "react";
 import { FaSyncAlt } from "react-icons/fa";
+import { RoleGuard } from "./GoogleLogin/PrivateRoute";
 
 export default function ExchangeHero({ onRefresh, loading }) {
   return (
@@ -15,25 +16,27 @@ export default function ExchangeHero({ onRefresh, loading }) {
           </p>
         </div>
 
-        <div className="flex justify-center items-center font-bold w-full">
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-5 py-4 rounded-2xl bg-aqua-gradient text-white text-lg hover:opacity-95 shadow disabled:opacity-70 transition"
-          >
-            {loading ? (
-              <>
-                <FaSyncAlt className="animate-spin" />
-                Actualizando...
-              </>
-            ) : (
-              <>
-                <FaSyncAlt />
-                Actualizar Tasas
-              </>
-            )}
-          </button>
-        </div>
+        <RoleGuard allowedRoles={["admin"]}>
+          <div className="flex justify-center items-center font-bold w-full">
+            <button
+              onClick={onRefresh}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-4 rounded-2xl bg-aqua-gradient text-white text-lg hover:opacity-95 shadow disabled:opacity-70 transition"
+            >
+              {loading ? (
+                <>
+                  <FaSyncAlt className="animate-spin" />
+                  Actualizando...
+                </>
+              ) : (
+                <>
+                  <FaSyncAlt />
+                  Actualizar Tasas
+                </>
+              )}
+            </button>
+          </div>
+        </RoleGuard>
       </div>
     </section>
   );

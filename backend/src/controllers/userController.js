@@ -26,7 +26,7 @@ export const googleAuthController = async (req, res) => {
 
     const fullName = payload.name || "";
     const [firstName, ...rest] = fullName.split(" ");
-    
+
     const lastName = rest.join(" ");
 
     let user = await UserModel.getByEmail(email);
@@ -36,24 +36,13 @@ export const googleAuthController = async (req, res) => {
 
       user = await UserModel.create({
         email,
-        companyName: role === "admin" ? payload.hd || "RecordApp" : null,
+        companyName: role === "admin" ? payload.hd || "Record" : null,
         firstName: payload.given_name || firstName,
         lastName: payload.family_name || lastName,
         photo: payload.picture,
         role,
       });
-    } else {
-      user = await UserModel.upsert({
-        email,
-        companyName:
-          user.role === "admin" ? payload.hd || "RecordApp" : user.company_name,
-        firstName: payload.given_name || firstName,
-        lastName: payload.family_name || lastName,
-        photo: payload.picture || user.photo,
-        role: allowedAdmins.includes(email) ? "admin" : user.role,
-      });
     }
-
     const appToken = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
