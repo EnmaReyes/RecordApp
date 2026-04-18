@@ -11,4 +11,14 @@ const PrivateRoute = ({ children, requiredRole }) => {
   return children;
 };
 
-export default PrivateRoute;
+const RoleGuard = ({ children, allowedRoles }) => {
+  const { auth } = useCurrencies();
+
+  if (!auth || (allowedRoles && !allowedRoles.includes(auth.role))) {
+    return null;
+  }
+
+  return children;
+};
+
+export { RoleGuard, PrivateRoute };
