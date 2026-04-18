@@ -27,11 +27,11 @@ const GoogleLoginButton = () => {
           login(res.data);
 
           toast.success(
-            `Bienvenido ${res.data.role?.toUpperCase()} ${res.data.firstName} ${res.data.lastName}!`,
+            `Bienvenido ${res.data.firstName} ${res.data.lastName} 😎`,
             {
               position: "top-center",
               theme: "dark",
-              autoClose: 1000,
+              autoClose: 2500,
             },
           );
         } catch (err) {
