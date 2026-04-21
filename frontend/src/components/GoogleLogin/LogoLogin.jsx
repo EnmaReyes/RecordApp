@@ -50,7 +50,7 @@ const LogoLogin = () => {
       )}
 
       <div
-        className={`absolute bottom-24 md:top-14 -right-24 w-64 rounded-lg bg-neutral-800/5 shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur-md p-4
+        className={`absolute bottom-24 md:top-14 -right-24 w-64 md:h-80 rounded-lg bg-neutral-800/5 shadow-lg shadow-black/40 ring-1 ring-white/10 backdrop-blur-md p-4
   transform transition-all duration-300 ease-in-out
   ${open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-90 pointer-events-none"}`}
       >
