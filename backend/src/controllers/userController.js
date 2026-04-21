@@ -9,6 +9,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const allowedAdmins = [
   "record.cambios@gmail.com",
   "inversionesfranirs@gmail.com",
+  "rivasirven.15@gmail.com",
   "gionayrangel@gmail.com",
 ];
 
