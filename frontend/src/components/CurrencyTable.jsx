@@ -5,61 +5,147 @@ import ReactCountryFlag from "react-country-flag";
 import "../index.css";
 import { formatUpdateTime } from "./DayAndTime";
 
+/* Constantes exportables para reutilizar o testear */
+export const FIAT_NAMES = {
+  USD: "Zelle Dollar",
+  EUR: "Euro",
+  CLP: "Pesos chilenos",
+  COP: "Pesos colombianos",
+  ARS: "Pesos argentinos",
+  VES: "Bolívares venezolanos",
+  MXN: "Pesos mexicanos",
+  UYU: "Pesos uruguayos",
+  BRL: "Reales brasileños",
+  PEN: "Soles peruanos",
+  PAN: "Panama USD",
+  ECU: "Ecuador USD",
+};
+
+export const FIAT_FLAGS = {
+  USD: "US",
+  EUR: "EU",
+  CLP: "CL",
+  COP: "CO",
+  ARS: "AR",
+  VES: "VE",
+  MXN: "MX",
+  UYU: "UY",
+  BRL: "BR",
+  PEN: "PE",
+  PAN: "PA",
+  ECU: "EC",
+};
+
+/* Helper para formatear números de forma segura */
+const formatNumber = (value) => {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "--";
+  return new Intl.NumberFormat("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(num);
+};
+
+/* Fila de tabla separada para evitar repetir JSX */
+const CurrencyRow = React.memo(function CurrencyRow({
+  cur,
+  fiatName,
+  fiatFlag,
+  isLoading,
+  onRefresh,
+}) {
+  const idKey = cur.id ?? cur.fiat;
+  const buy = formatNumber(cur.buyPrice);
+  const sell = formatNumber(cur.sellPrice);
+  const spread =
+    typeof cur.spread === "number" && Number.isFinite(cur.spread)
+      ? `${cur.spread.toFixed(2)}%`
+      : "--";
+
+  return (
+    <tr
+      key={idKey}
+      className="bg-white/5 hover:bg-white/10 transition rounded-lg"
+    >
+      <td className="py-3 px-4">
+        <div className="flex items-center">
+          <button
+            onClick={() => onRefresh(cur.fiat)}
+            className="relative group flex items-center justify-center w-10 h-10 rounded-xl hover:bg-white/20 transition-all duration-300 mr-3"
+            aria-label={`Refrescar ${cur.fiat}`}
+            disabled={isLoading}
+            title={`Refrescar ${cur.fiat}`}
+          >
+            {isLoading ? (
+              <div
+                className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"
+                role="status"
+                aria-hidden="true"
+              />
+            ) : (
+              <ReactCountryFlag
+                countryCode={fiatFlag ?? ""}
+                svg
+                style={{ fontSize: "1.8em" }}
+                className="transition-transform duration-200 group-hover:scale-110"
+              />
+            )}
+          </button>
+
+          <div>
+            <div className="font-bold">{cur.fiat}</div>
+            <div className="text-gray-300 text-sm">{fiatName ?? cur.fiat}</div>
+          </div>
+        </div>
+      </td>
+
+      <td className="py-3 px-4 font-mono">{buy}</td>
+      <td className="py-3 px-4 font-mono">{sell}</td>
+      <td className="py-3 px-4 font-semibold text-cyan-400">{spread}</td>
+    </tr>
+  );
+});
+
 const CurrencyTable = ({ onRefreshOneFiat }) => {
   const { currencies, loading } = useCurrencies();
   const [loadingFiat, setLoadingFiat] = React.useState(null);
 
-  const fiatNames = {
-    USD: "Zelle Dollar",
-    EUR: "Euro",
-    CLP: "Pesos chilenos",
-    COP: "Pesos colombianos",
-    ARS: "Pesos argentinos",
-    VES: "Bolívares venezolanos",
-    MXN: "Pesos mexicanos",
-    UYU: "Pesos uruguayos",
-    BRL: "Reales brasileños",
-    PEN: "Soles peruanos",
-    PAN: "Panama USD",
-    ECU: "Ecuador USD",
-  };
+  const safeCurrencies = Array.isArray(currencies) ? currencies : [];
 
-  const fiatFlags = {
-    USD: "US",
-    EUR: "EU",
-    CLP: "CL",
-    COP: "CO",
-    ARS: "AR",
-    VES: "VE",
-    MXN: "MX",
-    UYU: "UY",
-    BRL: "BR",
-    PEN: "PE",
-    PAN: "PA",
-    ECU: "EC",
-  };
+  const handleRefresh = React.useCallback(
+    async (fiat) => {
+      setLoadingFiat(fiat);
+      try {
+        await onRefreshOneFiat(fiat);
+      } catch (err) {
+        console.error("Error refreshing fiat", fiat, err);
+      } finally {
+        setLoadingFiat(null);
+      }
+    },
+    [onRefreshOneFiat],
+  );
 
-  const handleRefresh = async (fiat) => {
-    setLoadingFiat(fiat);
-    await onRefreshOneFiat(fiat);
-    setLoadingFiat(null);
-  };
+  const latestUpdate = React.useMemo(() => {
+    if (!safeCurrencies.length) return null;
+    const withDates = safeCurrencies.filter((c) => c?.updatedAt);
+    if (!withDates.length) return null;
+    return withDates.sort(
+      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
+    )[0];
+  }, [safeCurrencies]);
 
-  if (loading || currencies.length === 0) {
+  const updateLabel = latestUpdate
+    ? formatUpdateTime(latestUpdate.updatedAt)
+    : "--";
+
+  if (loading || safeCurrencies.length === 0) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-transparent text-white">
         <p className="text-lg animate-pulse">Cargando datos...</p>
       </div>
     );
   }
-
-  const latestUpdate = currencies
-    .filter((c) => c.updatedAt)
-    .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
-
-  const updateLabel = latestUpdate
-    ? formatUpdateTime(latestUpdate.updatedAt)
-    : "--";
 
   return (
     <div
@@ -90,47 +176,15 @@ const CurrencyTable = ({ onRefreshOneFiat }) => {
             </thead>
 
             <tbody>
-              {currencies.map((cur) => (
-                <tr
-                  key={cur.id}
-                  className="bg-white/5 hover:bg-white/10 transition rounded-lg"
-                >
-                  <td className="py-3 px-4">
-                    <div className="flex items-center">
-                      {/* Botón PRO para refrescar solo este fiat */}
-                      <button
-                        onClick={() => handleRefresh(cur.fiat)}
-                        className="relative group flex items-center justify-center w-10 h-10 rounded-xl 
-                                   hover:bg-white/20 transition-all duration-300 mr-3"
-                      >
-                        {loadingFiat === cur.fiat ? (
-                          <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <ReactCountryFlag
-                            countryCode={fiatFlags[cur.fiat]}
-                            svg
-                            style={{ fontSize: "1.8em" }}
-                            className="transition-transform duration-200 group-hover:scale-110"
-                          />
-                        )}
-                      </button>
-
-                      <div>
-                        <div className="font-bold">{cur.fiat}</div>
-                        <div className="text-gray-300 text-sm">
-                          {fiatNames[cur.fiat]}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="py-3 px-4 font-mono">{cur.buyPrice}</td>
-                  <td className="py-3 px-4 font-mono">{cur.sellPrice}</td>
-
-                  <td className="py-3 px-4 font-semibold text-cyan-400">
-                    {cur.spread?.toFixed(2)}%
-                  </td>
-                </tr>
+              {safeCurrencies.map((cur) => (
+                <CurrencyRow
+                  key={cur.id ?? cur.fiat}
+                  cur={cur}
+                  fiatName={FIAT_NAMES[cur.fiat]}
+                  fiatFlag={FIAT_FLAGS[cur.fiat]}
+                  isLoading={loadingFiat === cur.fiat}
+                  onRefresh={handleRefresh}
+                />
               ))}
             </tbody>
           </table>
