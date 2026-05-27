@@ -11,6 +11,7 @@ const allowedAdmins = [
   "inversionesfranirs@gmail.com",
   "rivasirven.15@gmail.com",
   "gionayrangel@gmail.com",
+  "yairadelfina.123@gmail.com",
 ];
 
 export const googleAuthController = async (req, res) => {
