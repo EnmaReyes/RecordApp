@@ -5,7 +5,6 @@ export function selectRobust(filtered) {
     (f) =>
       f.adv?.price &&
       f.adv.tradeMethods?.length > 0 &&
-      f.advertiser?.nickName &&
       Number(f.adv.minSingleTransAmount) > 0,
   );
 
@@ -16,7 +15,7 @@ export function selectRobust(filtered) {
   );
 
   // 🔥 eliminar extremos (outliers)
-  const trimmed = sorted.length > 2 ? sorted.slice(1, -1) : sorted;
+  const trimmed = sorted.length > 4 ? sorted.slice(1, -1) : sorted;
 
   return trimmed[Math.floor(trimmed.length / 2)];
 }
