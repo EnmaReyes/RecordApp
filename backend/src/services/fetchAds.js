@@ -2,7 +2,12 @@ import axios from "axios";
 
 const API_URL = process.env.API_URL;
 
-export async function fetchAds({ fiat, tradeType, minAmount, payTypes }) {
+export async function fetchAds({
+  fiat,
+  tradeType,
+  minAmount,
+  payTypes,
+}) {
   const params = {
     asset: "USDT",
     fiat,
@@ -17,9 +22,10 @@ export async function fetchAds({ fiat, tradeType, minAmount, payTypes }) {
 
   try {
     let { data } = await axios.post(API_URL, params);
+
     let results = data?.data;
 
-    // 🔁 fallback sin filtros
+    // 🔁 Fallback sin filtros
     if (!results?.length) {
       const fallbackParams = {
         ...params,
@@ -28,16 +34,31 @@ export async function fetchAds({ fiat, tradeType, minAmount, payTypes }) {
       };
 
       ({ data } = await axios.post(API_URL, fallbackParams));
+
       results = data?.data;
     }
 
-    return Array.isArray(results)
-      ? results.filter(
-          (item) => Number(item.adv.minSingleTransAmount) >= minAmount,
-        )
-      : [];
+    if (!Array.isArray(results)) {
+      return [];
+    }
+
+    return results.filter((item) => {
+      const min = Number(item.adv?.minSingleTransAmount);
+      const max = Number(item.adv?.maxSingleTransAmount);
+
+      return (
+        Number.isFinite(min) &&
+        Number.isFinite(max) &&
+        min <= minAmount &&
+        max >= minAmount
+      );
+    });
   } catch (error) {
-    console.error(`❌ Error fetching ${fiat} ${tradeType}:`, error.message);
+    console.error(
+      `❌ Error fetching ${fiat} ${tradeType}:`,
+      error.message,
+    );
+
     return [];
   }
 }
