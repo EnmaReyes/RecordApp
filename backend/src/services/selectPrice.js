@@ -1,21 +1,28 @@
-export function selectRobust(filtered) {
+const selectionConfig = {
+  SELL: 2,
+  BUY: 2,
+};
+
+export function selectRobust(filtered, tradeType) {
   if (!filtered?.length) return null;
 
-  const valid = filtered.filter(
-    (f) =>
-      f.adv?.price &&
-      f.adv.tradeMethods?.length > 0 &&
-      Number(f.adv.minSingleTransAmount) > 0,
-  );
+  const valid = filtered.filter((item) => {
+    const price = Number(item.adv?.price);
+    const min = Number(item.adv?.minSingleTransAmount);
+    const max = Number(item.adv?.maxSingleTransAmount);
+
+    return (
+      Number.isFinite(price) &&
+      price > 0 &&
+      Number.isFinite(min) &&
+      Number.isFinite(max) &&
+      item.adv?.tradeMethods?.length > 0
+    );
+  });
 
   if (!valid.length) return null;
 
-  const sorted = valid.sort(
-    (a, b) => Number(a.adv.price) - Number(b.adv.price),
-  );
+  const index = selectionConfig[tradeType] ?? 0;
 
-  // 🔥 eliminar extremos (outliers)
-  const trimmed = sorted.length > 4 ? sorted.slice(1, -1) : sorted;
-
-  return trimmed[Math.floor(trimmed.length / 2)];
+  return valid[Math.min(index, valid.length - 1)];
 }
