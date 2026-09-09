@@ -89,6 +89,7 @@ const ExchangeBox = () => {
     map.URU = getRate("UYU", "VES");
     map.USD = getRate("USD", "VES");
     map.VEN_COL = getRate("VES", "COP");
+    map.PAN = getRate("PAN", "VES");
 
     return map;
   }, [calculatedRates]);
@@ -117,7 +118,10 @@ const ExchangeBox = () => {
     setModes((prev) => ({ ...prev, [fiat]: newMode }));
   };
   return (
-    <div id="tasas" className="flex flex-col justify-center gap-5 w-max">
+    <div
+      id="tasas"
+      className="flex flex-col justify-center gap-5 w-max mb-12 mx-auto"
+    >
       {currencies.map((baseFiat) => (
         <div key={baseFiat.id} id={baseFiat.fiat}>
           <div className="flex md:flex-row flex-col justify-center items-center w-full md:mb-8 mb-4">
