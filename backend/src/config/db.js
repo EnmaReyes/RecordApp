@@ -1,6 +1,6 @@
 import pkg from "pg";
 import dotenv from "dotenv";
-import { createPricesTable, PricesModel } from "../models/Price.js";
+import { createPricesTable, createPriceHistoryTable } from "../models/Price.js";
 import { createUsersTable } from "../models/User.js";
 
 dotenv.config();
@@ -33,11 +33,11 @@ export const pool = new Pool(
 export const initDB = async () => {
   try {
     await createPricesTable();
+    await createPriceHistoryTable();
     await createUsersTable();
-
-    console.log("✅ Tabla Prices y Users verificada/creada");
+    console.log("✅ Tablas Prices, PriceHistory y Users verificadas/creadas");
   } catch (error) {
-    console.error("❌ Error creando tabla:", error);
+    console.error("❌ Error creando tablas:", error);
   }
 };
 /*
