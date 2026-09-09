@@ -5,26 +5,28 @@ export default function WhatsAppButton({ rates }) {
     if (!rates) return "Un problema ocurrió al obtener las tasas de cambio.";
 
     return `
-🌤 FELIZ DÍA TE DESEA 
-         CAMBIOS RECORD 🌥
-   Haz tus cambios desde
+🌤️ ¡FELIZ DÍA! *CAMBIOS RECORD* 🌥️
+               TASAS DEL DÍA
+               
+━━━━━━━━━━━━━━━━━━━━━━━━
+🇨🇴 a 🇻🇪: ${rates.COL || "-"}      |   🇨🇱 a 🇻🇪: ${rates.CHL || "-"}
 
-🇨🇴 a 🇻🇪: ${rates.COL || "-"}       |    🇨🇱 a 🇻🇪: ${rates.CHL || "-"}
+🇲🇽 a 🇻🇪: ${rates.MEX || "-"}    |   🇦🇷 a 🇻🇪: ${rates.ARG || "-"}
 
-🇲🇽 a 🇻🇪: ${rates.MEX || "-"}      |    🇦🇷 a 🇻🇪: ${rates.ARG || "-"}
+🇵🇪 a 🇻🇪: ${rates.PER || "-"}  |   🇧🇷 a 🇻🇪: ${rates.BRA || "-"}
 
-🇵🇪 a 🇻🇪: ${rates.PER || "-"}     |    🇧🇷 a 🇻🇪: ${rates.BRA || "-"}
+🇪🇸 a 🇻🇪: ${rates.ESP || "-"}  |   🇺🇾 a 🇻🇪: ${rates.URU || "-"} 
 
-🇪🇸 a 🇻🇪: ${rates.ESP || "-"}     |    🇺🇾 a 🇻🇪: ${rates.URU || "-"} 
+🇺🇸 a 🇻🇪: ${rates.USD || "-"}  |   🇵🇦 a 🇻🇪: ${rates.PAN || "-"}
 
-🇺🇸 a 🇻🇪: ${rates.USD || "-"}     |    🇻🇪 a 🇨🇴: ${rates.VEN_COL || "-"}   
- 
-⚠ A considerar:
-💬 Pedir número de cuenta
-antes de consignar o transferir
+                 🇻🇪 a 🇨🇴: ${rates.VEN_COL || "-"}   
+━━━━━━━━━━━━━━━━━━━━━━━━
 
-💬 Tasa sujeta a cambios
-sin previo aviso
+⚠️ A CONSIDERAR
+
+💬 Solicita el número de cuenta antes de transferir.
+
+💬 Tasa sujeta a cambios sin previo aviso.
 `;
   }, [rates]);
 
