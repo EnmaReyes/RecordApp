@@ -5,7 +5,6 @@ import {
   getDBPrices,
   getDBPriceByFiat,
 } from "../controllers/priceController.js";
-import { googleAuthController } from "../controllers/userController.js";
 
 const router = express.Router();
 

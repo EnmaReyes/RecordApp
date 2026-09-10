@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
-import { pool } from "../config/db.js";
-import { PriceHistoryModel, PricesModel } from "../models/Price.js";
+import sequelize from "../config/db.js";
+import { PriceHistoryModel } from "../models/PriceHistory.js";
+import { PricesModel } from "../models/Price.js";
 import {
   fetchP2PData,
   fetchAllCurrencies,
@@ -38,34 +39,13 @@ function buildRecord(fiat, data) {
    Helper para guardar histórico
 ========================================================= */
 
-async function saveHistory(record, snapshotId, db) {
+async function saveHistory(prices, snapshotId, transaction) {
   return await PriceHistoryModel.create(
     {
       snapshotId,
-
-      fiat: record.fiat,
-
-      buyPrice: record.buyPrice,
-      sellPrice: record.sellPrice,
-
-      buyMin: record.buyMin,
-      buyMax: record.buyMax,
-
-      sellMin: record.sellMin,
-      sellMax: record.sellMax,
-
-      buyMethods: record.buyMethods,
-      sellMethods: record.sellMethods,
-
-      buyAdvertiser: record.buyAdvertiser,
-      sellAdvertiser: record.sellAdvertiser,
-
-      buyPosition: record.buyPosition,
-      sellPosition: record.sellPosition,
-
-      source: record.source,
+      prices,
     },
-    db,
+    { transaction },
   );
 }
 
@@ -75,8 +55,6 @@ async function saveHistory(record, snapshotId, db) {
 
 export async function getPriceByFiat(req, res) {
   const { fiat } = req.params;
-
-  let client;
 
   try {
     // 1️⃣ Obtener datos desde Binance
@@ -94,20 +72,16 @@ export async function getPriceByFiat(req, res) {
     // 3️⃣ Crear snapshot
     const snapshotId = randomUUID();
 
-    // 4️⃣ Obtener conexión exclusiva
-    client = await pool.connect();
-
-    // 5️⃣ Iniciar transacción
-    await client.query("BEGIN");
-
-    // 6️⃣ Actualizar precio actual
-    const updatedPrice = await PricesModel.upsert(record, client);
-
-    // 7️⃣ Guardar histórico
-    const historyPrice = await saveHistory(record, snapshotId, client);
-
-    // 8️⃣ Confirmar
-    await client.query("COMMIT");
+    const { updatedPrice, historyPrice } = await sequelize.transaction(
+      async (transaction) => ({
+        updatedPrice: await PricesModel.upsert(record, { transaction }),
+        historyPrice: await saveHistory(
+          { [record.fiat]: record },
+          snapshotId,
+          transaction,
+        ),
+      }),
+    );
 
     res.json({
       message: `✅ ${fiat} actualizado correctamente.`,
@@ -116,29 +90,15 @@ export async function getPriceByFiat(req, res) {
 
       history: {
         snapshotId,
-        createdAt: historyPrice.created_at,
+        createdAt: historyPrice.createdAt,
       },
     });
   } catch (error) {
-    // Si hubo error, deshacer TODO
-    if (client) {
-      try {
-        await client.query("ROLLBACK");
-      } catch (rollbackError) {
-        console.error("❌ Error haciendo ROLLBACK:", rollbackError.message);
-      }
-    }
-
     console.error(`❌ Error al actualizar ${fiat}:`, error);
 
     res.status(500).json({
       error: error.message,
     });
-  } finally {
-    // Liberar conexión
-    if (client) {
-      client.release();
-    }
   }
 }
 
@@ -147,8 +107,6 @@ export async function getPriceByFiat(req, res) {
 ========================================================= */
 
 export async function getAllPrices(req, res) {
-  let client;
-
   try {
     // 1️⃣ Obtener todas las tasas
     const prices = await fetchAllCurrencies();
@@ -162,30 +120,25 @@ export async function getAllPrices(req, res) {
     // 2️⃣ Un snapshot representa TODA esta actualización
     const snapshotId = randomUUID();
 
-    // 3️⃣ Obtener conexión
-    client = await pool.connect();
+    const { updatedPrices, historyPrice } = await sequelize.transaction(
+      async (transaction) => {
+        const updatedPrices = [];
+        const pricesByFiat = {};
 
-    // 4️⃣ Iniciar transacción
-    await client.query("BEGIN");
+        for (const record of prices) {
+          updatedPrices.push(await PricesModel.upsert(record, { transaction }));
+          pricesByFiat[record.fiat] = record;
+        }
 
-    const updatedPrices = [];
-    const historyPrices = [];
+        const historyPrice = await saveHistory(
+          pricesByFiat,
+          snapshotId,
+          transaction,
+        );
 
-    // 5️⃣ Guardar cada moneda
-    for (const item of prices) {
-      const record = item;
-
-      const updatedPrice = await PricesModel.upsert(record, client);
-
-      updatedPrices.push(updatedPrice);
-
-      const historyPrice = await saveHistory(record, snapshotId, client);
-
-      historyPrices.push(historyPrice);
-    }
-
-    // 6️⃣ Confirmar TODA la operación
-    await client.query("COMMIT");
+        return { updatedPrices, historyPrice };
+      },
+    );
 
     res.json({
       message: "Precios actualizados correctamente",
@@ -195,30 +148,16 @@ export async function getAllPrices(req, res) {
       data: updatedPrices,
 
       history: {
-        count: historyPrices.length,
-
-        createdAt: historyPrices[0]?.created_at ?? null,
+        count: Object.keys(historyPrice.prices).length,
+        createdAt: historyPrice.createdAt,
       },
     });
   } catch (error) {
-    if (client) {
-      try {
-        await client.query("ROLLBACK");
-      } catch (rollbackError) {
-        console.error("❌ Error haciendo ROLLBACK:", rollbackError.message);
-      }
-    }
-
     console.error("❌ Error al actualizar precios:", error);
 
     res.status(500).json({
       error: error.message,
     });
-  } finally {
-    // Liberar conexión
-    if (client) {
-      client.release();
-    }
   }
 }
 
@@ -315,6 +254,20 @@ export async function getHistoryByDate(req, res) {
 }
 
 /* =========================================================
+   Obtener todas las actualizaciones históricas
+========================================================= */
+
+export async function getHistory(req, res) {
+  try {
+    const history = await PriceHistoryModel.getAll();
+    res.json({ data: history });
+  } catch (error) {
+    console.error("❌ Error al obtener el histórico:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+/* =========================================================
    Obtener snapshot completo
 ========================================================= */
 
@@ -324,7 +277,7 @@ export async function getHistoryBySnapshot(req, res) {
   try {
     const history = await PriceHistoryModel.getBySnapshot(snapshotId);
 
-    if (!history.length) {
+    if (!history) {
       return res.status(404).json({
         error: "No se encontró el snapshot solicitado.",
       });
