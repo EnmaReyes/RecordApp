@@ -1,12 +1,15 @@
 import dotenv from "dotenv";
+import pg from "pg";
 import { Sequelize } from "sequelize";
 
 dotenv.config();
 
-const isProduction = process.env.NODE_ENV === "production";
-
 const sequelizeOptions = {
   dialect: "postgres",
+
+  // Le indicamos explícitamente a Sequelize qué driver usar
+  dialectModule: pg,
+
   logging: false,
 
   pool: {

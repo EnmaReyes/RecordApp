@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 
-import sequelize, { initDB } from "./config/db.js";
+import { initDB } from "./config/db.js";
 
 import routes from "./routes/routes.js";
 import historyRoutes from "./routes/history.routes.js";
