@@ -5,17 +5,30 @@ export class PriceHistory extends Model {}
 
 PriceHistory.init(
   {
-    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+    id: {
+      type: DataTypes.BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+
     snapshotId: {
       type: DataTypes.UUID,
       allowNull: false,
+      unique: true,
       field: "snapshot_id",
     },
-    prices: { type: DataTypes.JSONB, allowNull: false, defaultValue: {} },
+
+    prices: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+      defaultValue: {},
+    },
+
     createdAt: {
       type: DataTypes.DATE,
-      field: "created_at",
+      allowNull: false,
       defaultValue: DataTypes.NOW,
+      field: "created_at",
     },
   },
   {
@@ -23,26 +36,20 @@ PriceHistory.init(
     modelName: "PriceHistory",
     tableName: "price_history",
     timestamps: false,
-    indexes: [{ fields: ["created_at"] }, { fields: ["snapshot_id"] }],
+
+    indexes: [
+      {
+        fields: ["created_at"],
+      },
+      {
+        fields: ["snapshot_id"],
+      },
+    ],
   },
 );
 
 export const createPriceHistoryTable = async () => {
   await PriceHistory.sync();
-
-  await sequelize.query(`
-    DO $$
-    BEGIN
-      IF EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_name = 'price_history'
-          AND column_name = 'fiat'
-      ) THEN
-        ALTER TABLE price_history ALTER COLUMN fiat DROP NOT NULL;
-      END IF;
-    END $$;
-  `);
 };
 
 const toPlain = (row) => {
@@ -51,31 +58,35 @@ const toPlain = (row) => {
   const value = row.get({ plain: true });
 
   return {
+    ...value,
     id: Number(value.id),
-    snapshotId: value.snapshotId,
-    snapshot_id: value.snapshotId,
     prices: value.prices || {},
-    createdAt: value.createdAt,
-    created_at: value.createdAt,
   };
-};
-
-const currentSnapshotsWhere = {
-  prices: { [Op.ne]: {} },
 };
 
 export const PriceHistoryModel = {
   async create({ snapshotId, prices }, options = {}) {
-    return toPlain(await PriceHistory.create({ snapshotId, prices }, options));
+    return toPlain(
+      await PriceHistory.create(
+        {
+          snapshotId,
+          prices,
+        },
+        options,
+      ),
+    );
   },
 
   async getByFiat(fiat, options = {}) {
+    const normalizedFiat = fiat?.trim().toUpperCase();
+
     const rows = await PriceHistory.findAll({
       where: {
-        [Op.and]: [
-          currentSnapshotsWhere,
-          { prices: { [Op.contains]: { [fiat]: {} } } },
-        ],
+        prices: {
+          [Op.contains]: {
+            [normalizedFiat]: {},
+          },
+        },
       },
       order: [["createdAt", "DESC"]],
       ...options,
@@ -85,15 +96,14 @@ export const PriceHistoryModel = {
   },
 
   async getByDate(date, options = {}) {
+    const start = new Date(`${date}T00:00:00.000Z`);
+    const end = new Date(`${date}T23:59:59.999Z`);
+
     const rows = await PriceHistory.findAll({
       where: {
-        [Op.and]: [
-          currentSnapshotsWhere,
-          sequelize.where(
-            sequelize.fn("DATE", sequelize.col("created_at")),
-            date,
-          ),
-        ],
+        createdAt: {
+          [Op.between]: [start, end],
+        },
       },
       order: [["createdAt", "DESC"]],
       ...options,
@@ -105,7 +115,9 @@ export const PriceHistoryModel = {
   async getBySnapshot(snapshotId, options = {}) {
     return toPlain(
       await PriceHistory.findOne({
-        where: { [Op.and]: [currentSnapshotsWhere, { snapshotId }] },
+        where: {
+          snapshotId,
+        },
         ...options,
       }),
     );
@@ -113,7 +125,6 @@ export const PriceHistoryModel = {
 
   async getAll(options = {}) {
     const rows = await PriceHistory.findAll({
-      where: currentSnapshotsWhere,
       order: [["createdAt", "DESC"]],
       ...options,
     });
@@ -124,7 +135,6 @@ export const PriceHistoryModel = {
   async getLatestSnapshot(options = {}) {
     return toPlain(
       await PriceHistory.findOne({
-        where: currentSnapshotsWhere,
         order: [["createdAt", "DESC"]],
         ...options,
       }),
