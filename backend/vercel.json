@@ -1,12 +1,15 @@
 {
-   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
-    { "src": "src/index.js",
-      "use": "@vercel/node", 
-      "config": { "includeFiles": ["src/**"] } }
+    {
+      "src": "src/index.js",
+      "use": "@vercel/node"
+    }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "src/index.js" }
-  ],
-  "buildCommand": "npm install"
+    {
+      "src": "/(.*)",
+      "dest": "src/index.js"
+    }
+  ]
 }
