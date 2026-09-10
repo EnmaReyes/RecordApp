@@ -1,10 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { pool } from "./config/db.js";
+import sequelize, { initDB } from "./config/db.js";
 import routes from "./routes/routes.js";
+import historyRoutes from "./routes/history.routes.js";
 import authRoutes from "./routes/auth.routes.js";
-import { initDB } from "./config/db.js";
 
 dotenv.config();
 
@@ -22,14 +22,26 @@ app.use(
 
 app.use(express.json());
 
+const databaseReady = initDB();
+app.use(async (req, res, next) => {
+  try {
+    await databaseReady;
+    next();
+  } catch (error) {
+    res
+      .status(503)
+      .json({ error: "Base de datos no disponible", detail: error.message });
+  }
+});
+
 /* ---------- Routes ---------- */
 app.use("/prices", routes);
-
+app.use("/history", historyRoutes);
 app.use("/api", authRoutes);
 /* ---------- Health check ---------- */
 app.get("/", async (req, res) => {
   try {
-    await pool.query("SELECT 1");
+    await sequelize.authenticate();
     res.json({ status: "ok", db: "connected" });
   } catch (error) {
     res.status(500).json({ status: "error", error: error.message });
@@ -39,7 +51,7 @@ app.get("/", async (req, res) => {
 /* ---------- Start server ---------- */
 const startServer = async () => {
   try {
-    await initDB();
+    await databaseReady;
 
     app.listen(PORT, () => console.log(`🚀 Servidor local en puerto ${PORT}`));
   } catch (error) {
@@ -48,6 +60,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 export default app;
