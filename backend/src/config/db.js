@@ -3,36 +3,83 @@ import { Sequelize } from "sequelize";
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const sequelizeOptions = {
   dialect: "postgres",
   logging: false,
-  pool: { max: 5, min: 0, idle: 10000 },
+
+  pool: {
+    max: 3,
+    min: 0,
+    idle: 10000,
+    acquire: 30000,
+  },
 };
 
-export const sequelize = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
-      ...sequelizeOptions,
-      dialectOptions: {
-        ssl: { require: true, rejectUnauthorized: false },
-      },
-    })
-  : new Sequelize(
-      process.env.POSTGRES_DATABASE,
-      process.env.POSTGRES_USER,
-      process.env.POSTGRES_PASSWORD,
-      {
-        ...sequelizeOptions,
-        host: process.env.POSTGRES_HOST,
-        port: process.env.POSTGRES_PORT || 5432,
-      },
-    );
+let sequelize;
 
-export const initDB = async () => {
-  await sequelize.authenticate();
-  await sequelize.sync();
-  const { createPriceHistoryTable } = await import("../models/PriceHistory.js");
-  await createPriceHistoryTable();
-  console.log("✅ Tablas Prices, PriceHistory y Users verificadas/creadas");
+if (process.env.DATABASE_URL) {
+  // Neon / PostgreSQL remoto
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    ...sequelizeOptions,
+
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+
+      connectionTimeoutMillis: 30000,
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 10000,
+    },
+  });
+} else {
+  // PostgreSQL local
+  sequelize = new Sequelize(
+    process.env.POSTGRES_DATABASE,
+    process.env.POSTGRES_USER,
+    process.env.POSTGRES_PASSWORD,
+    {
+      ...sequelizeOptions,
+
+      host: process.env.POSTGRES_HOST || "localhost",
+      port: process.env.POSTGRES_PORT || 5432,
+    },
+  );
+}
+
+let dbReadyPromise = null;
+
+export const initDB = () => {
+  if (!dbReadyPromise) {
+    dbReadyPromise = (async () => {
+      try {
+        await sequelize.authenticate();
+
+        await sequelize.sync();
+
+        const { createPriceHistoryTable } =
+          await import("../models/PriceHistory.js");
+
+        await createPriceHistoryTable();
+
+        console.log(
+          "✅ Base de datos conectada y tablas verificadas correctamente",
+        );
+      } catch (error) {
+        dbReadyPromise = null;
+
+        console.error("❌ Error inicializando la base de datos:", error);
+
+        throw error;
+      }
+    })();
+  }
+
+  return dbReadyPromise;
 };
 
 export default sequelize;
+export { sequelize };
