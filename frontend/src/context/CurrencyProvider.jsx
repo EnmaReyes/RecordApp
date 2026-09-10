@@ -11,21 +11,37 @@ export const useCurrencies = () => useContext(CurrencyContext);
 const normalizeCurrency = (item) => ({
   id: item.id,
   fiat: item.fiat,
-  buyPrice: item.buy_price,
-  sellPrice: item.sell_price,
-  buyMethods: item.buy_methods || [],
-  sellMethods: item.sell_methods || [],
-  createdAt: item.created_at,
-  updatedAt: item.updated_at,
+
+  buyPrice: item.buyPrice ?? item.buy_price,
+  sellPrice: item.sellPrice ?? item.sell_price,
+
+  buyMin: item.buyMin ?? item.buy_min,
+  buyMax: item.buyMax ?? item.buy_max,
+  sellMin: item.sellMin ?? item.sell_min,
+  sellMax: item.sellMax ?? item.sell_max,
+
+  buyMethods: item.buyMethods ?? item.buy_methods ?? [],
+  sellMethods: item.sellMethods ?? item.sell_methods ?? [],
+
+  buyAdvertiser: item.buyAdvertiser ?? item.buy_advertiser,
+  sellAdvertiser: item.sellAdvertiser ?? item.sell_advertiser,
+
+  buyPosition: item.buyPosition ?? item.buy_position,
+  sellPosition: item.sellPosition ?? item.sell_position,
+
+  source: item.source,
+
+  createdAt: item.createdAt ?? item.created_at,
+  updatedAt: item.updatedAt ?? item.updated_at,
 });
 
 export const CurrencyProvider = ({ children }) => {
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrl = import.meta.env.VITE_API_URL; // /prices/update
-  const urlDB = import.meta.env.VITE_URLDB; // /prices
-  const BaseUrl = import.meta.env.VITE_BASE_URL; // http://localhost:3000
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const urlDB = import.meta.env.VITE_URLDB;
+  const BaseUrl = import.meta.env.VITE_BASE_URL;
   // 🔐 Estado de autenticación
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
