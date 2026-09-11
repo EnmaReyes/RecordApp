@@ -5,9 +5,6 @@ import { calcSpread } from "../utils/calcs.js";
 const CurrencyContext = createContext();
 export const useCurrencies = () => useContext(CurrencyContext);
 
-/**
- * 🔁 Normaliza datos del backend (snake_case → camelCase)
- */
 const normalizeCurrency = (item) => ({
   id: item.id,
   fiat: item.fiat,
@@ -17,6 +14,7 @@ const normalizeCurrency = (item) => ({
 
   buyMin: item.buyMin ?? item.buy_min,
   buyMax: item.buyMax ?? item.buy_max,
+
   sellMin: item.sellMin ?? item.sell_min,
   sellMax: item.sellMax ?? item.sell_max,
 
@@ -24,25 +22,49 @@ const normalizeCurrency = (item) => ({
   sellMethods: item.sellMethods ?? item.sell_methods ?? [],
 
   buyAdvertiser: item.buyAdvertiser ?? item.buy_advertiser,
+
   sellAdvertiser: item.sellAdvertiser ?? item.sell_advertiser,
 
   buyPosition: item.buyPosition ?? item.buy_position,
+
   sellPosition: item.sellPosition ?? item.sell_position,
 
   source: item.source,
 
   createdAt: item.createdAt ?? item.created_at,
+
   updatedAt: item.updatedAt ?? item.updated_at,
 });
 
 export const CurrencyProvider = ({ children }) => {
+  // ============================================================
+  // 💰 PRECIOS ACTUALES
+  // ============================================================
+
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // ============================================================
+  // 🕘 HISTORIAL
+  // ============================================================
+
+  // Lista liviana de snapshots para el selector
+  const [snapshots, setSnapshots] = useState([]);
+
+  // Precios del snapshot seleccionado
+  const [historyPrices, setHistoryPrices] = useState([]);
+
+  // Loading independiente del historial
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const apiUrl = import.meta.env.VITE_API_URL;
   const urlDB = import.meta.env.VITE_URLDB;
   const BaseUrl = import.meta.env.VITE_BASE_URL;
-  // 🔐 Estado de autenticación
+
+  // ============================================================
+  // 🔐 ESTADO DE AUTENTICACIÓN
+  // ============================================================
+
   const [auth, setAuth] = useState(() => {
     const token = localStorage.getItem("jwt");
     const id = localStorage.getItem("id");
@@ -54,9 +76,22 @@ export const CurrencyProvider = ({ children }) => {
     const email = localStorage.getItem("email");
 
     return token
-      ? { token, id, role, firstName, lastName, photo, companyName, email }
+      ? {
+          token,
+          id,
+          role,
+          firstName,
+          lastName,
+          photo,
+          companyName,
+          email,
+        }
       : null;
   });
+
+  // ============================================================
+  // 💱 ORDEN DE LAS MONEDAS
+  // ============================================================
 
   const fiatOrder = [
     "VES",
@@ -73,24 +108,38 @@ export const CurrencyProvider = ({ children }) => {
     "ECU",
   ];
 
-  // 🔄 Actualiza DB desde API externa
+  // ============================================================
+  // 🔄 ACTUALIZA DB DESDE API EXTERNA
+  // ============================================================
+
   const updateFromApi = async () => {
     try {
-      await axios.get(apiUrl, { headers: { "Cache-Control": "no-cache" } });
+      await axios.get(apiUrl, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
     } catch (error) {
       console.error("❌ Error updating currencies from API:", error);
     }
   };
 
-  // 🔄 Actualiza UN fiat
+  // ============================================================
+  // 🔄 ACTUALIZA UN FIAT
+  // ============================================================
+
   const updateOneFiatApi = async (fiat) => {
     try {
       await axios.get(`${apiUrl}/${fiat}`, {
-        headers: { "Cache-Control": "no-cache" },
+        headers: {
+          "Cache-Control": "no-cache",
+        },
       });
 
       const response = await axios.get(`${urlDB}/${fiat}`);
+
       const raw = response.data.data || response.data;
+
       const normalized = normalizeCurrency(raw);
 
       const updated = {
@@ -110,11 +159,16 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 💾 Obtiene datos desde DB
+  // ============================================================
+  // 💾 OBTIENE PRECIOS ACTUALES DESDE DB
+  // ============================================================
+
   const fetchFromDB = async () => {
     try {
       const response = await axios.get(urlDB, {
-        headers: { "Cache-Control": "no-cache" },
+        headers: {
+          "Cache-Control": "no-cache",
+        },
       });
 
       const rawData = response.data.data || response.data;
@@ -122,6 +176,7 @@ export const CurrencyProvider = ({ children }) => {
       const formatted = rawData
         .map((item) => {
           const normalized = normalizeCurrency(item);
+
           return {
             ...normalized,
             spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
@@ -135,14 +190,186 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 🚀 Al montar
+  // ============================================================
+  // 🕘 OBTENER LISTA DE SNAPSHOTS
+  // ============================================================
+
+  const fetchSnapshots = async () => {
+    try {
+      const response = await axios.get(`${BaseUrl}/history`, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      const rawData = response.data.data || response.data;
+
+      if (!Array.isArray(rawData)) {
+        setSnapshots([]);
+        return [];
+      }
+
+      /*
+       * IMPORTANTE:
+       *
+       * Aquí NO guardamos "prices".
+       *
+       * Solo conservamos la información necesaria
+       * para mostrar el selector de fecha/hora.
+       */
+
+      const formattedSnapshots = rawData.map((snapshot) => ({
+        id: snapshot.id,
+        snapshotId: snapshot.snapshotId,
+        createdAt: snapshot.createdAt,
+      }));
+
+      setSnapshots(formattedSnapshots);
+
+      return formattedSnapshots;
+    } catch (error) {
+      console.error("❌ Error fetching history snapshots:", error);
+
+      setSnapshots([]);
+
+      return [];
+    }
+  };
+
+  // ============================================================
+  // 🕘 OBTENER PRECIOS DE UN SNAPSHOT
+  // ============================================================
+
+  const fetchHistorySnapshot = async (snapshotId) => {
+    if (!snapshotId) {
+      setHistoryPrices([]);
+      return [];
+    }
+
+    setHistoryLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${BaseUrl}/history/snapshot/${snapshotId}`,
+        {
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        },
+      );
+
+      const responseData = response.data;
+
+      /*
+       * El endpoint puede devolver:
+       *
+       * { data: {...} }
+       *
+       * o directamente:
+       *
+       * {...}
+       *
+       * o incluso:
+       *
+       * { data: [{...}] }
+       */
+      let raw = responseData?.data ?? responseData;
+
+      if (Array.isArray(raw)) {
+        raw = raw[0];
+      }
+
+      const prices = raw?.prices;
+
+      if (!prices || typeof prices !== "object") {
+        console.warn("⚠️ El snapshot no contiene prices:", snapshotId, raw);
+
+        setHistoryPrices([]);
+        return [];
+      }
+
+      const formatted = Object.values(prices)
+        .map((item) => {
+          const normalized = normalizeCurrency(item);
+
+          return {
+            ...normalized,
+            spread: calcSpread(normalized.sellPrice, normalized.buyPrice),
+          };
+        })
+        .sort((a, b) => fiatOrder.indexOf(a.fiat) - fiatOrder.indexOf(b.fiat));
+
+      setHistoryPrices(formatted);
+
+      return formatted;
+    } catch (error) {
+      console.error(`❌ Error fetching snapshot ${snapshotId}:`, error);
+
+      setHistoryPrices([]);
+
+      return [];
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  // ============================================================
+  // 📅 OBTENER HISTORIAL POR FECHA
+  // ============================================================
+
+  const fetchHistoryByDate = async (date) => {
+    if (!date) {
+      setSnapshots([]);
+      return [];
+    }
+
+    try {
+      const response = await axios.get(`${BaseUrl}/history/date/${date}`, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      const rawData = response.data.data || response.data;
+
+      if (!Array.isArray(rawData)) {
+        setSnapshots([]);
+        return [];
+      }
+
+      const formattedSnapshots = rawData.map((snapshot) => ({
+        id: snapshot.id,
+        snapshotId: snapshot.snapshotId,
+        createdAt: snapshot.createdAt,
+      }));
+
+      setSnapshots(formattedSnapshots);
+
+      return formattedSnapshots;
+    } catch (error) {
+      console.error(`❌ Error fetching history for ${date}:`, error);
+
+      setSnapshots([]);
+
+      return [];
+    }
+  };
+
+  // ============================================================
+  // 🚀 AL MONTAR
+  // ============================================================
+
   useEffect(() => {
     fetchFromDB();
   }, []);
 
-  // 🔁 Refetch completo
+  // ============================================================
+  // 🔁 REFETCH COMPLETO
+  // ============================================================
+
   const fetchData = async () => {
     setLoading(true);
+
     try {
       await updateFromApi();
       await fetchFromDB();
@@ -151,7 +378,10 @@ export const CurrencyProvider = ({ children }) => {
     }
   };
 
-  // 📱 Media Query helper
+  // ============================================================
+  // 📱 MEDIA QUERY HELPER
+  // ============================================================
+
   const useMediaQuery = (query) => {
     const [matches, setMatches] = useState(
       () => window.matchMedia(query).matches,
@@ -159,16 +389,21 @@ export const CurrencyProvider = ({ children }) => {
 
     useEffect(() => {
       const media = window.matchMedia(query);
+
       const listener = () => setMatches(media.matches);
 
       media.addEventListener("change", listener);
+
       return () => media.removeEventListener("change", listener);
     }, [query]);
 
     return matches;
   };
 
-  // 🔐 Login
+  // ============================================================
+  // 🔐 LOGIN
+  // ============================================================
+
   const login = ({
     token,
     id,
@@ -200,7 +435,10 @@ export const CurrencyProvider = ({ children }) => {
     });
   };
 
-  // 🔐 Logout
+  // ============================================================
+  // 🔐 LOGOUT
+  // ============================================================
+
   const logout = () => {
     localStorage.removeItem("jwt");
     localStorage.removeItem("id");
@@ -210,10 +448,14 @@ export const CurrencyProvider = ({ children }) => {
     localStorage.removeItem("photo");
     localStorage.removeItem("companyName");
     localStorage.removeItem("email");
+
     setAuth(null);
   };
 
-  // ✏️ Actualizar datos de usuario (admin o user)
+  // ============================================================
+  // ✏️ ACTUALIZAR USUARIO
+  // ============================================================
+
   const updateUser = async (id, updatedData) => {
     try {
       const response = await axios.patch(
@@ -229,7 +471,6 @@ export const CurrencyProvider = ({ children }) => {
 
       const data = response.data;
 
-      // Actualizamos localStorage con los valores normalizados
       localStorage.setItem("firstName", data.first_name);
       localStorage.setItem("lastName", data.last_name);
       localStorage.setItem("photo", data.photo);
@@ -238,7 +479,6 @@ export const CurrencyProvider = ({ children }) => {
       localStorage.setItem("email", data.email);
       localStorage.setItem("id", data.id);
 
-      // Actualizamos estado global de auth
       setAuth({
         token: auth.token,
         id: data.id,
@@ -253,18 +493,37 @@ export const CurrencyProvider = ({ children }) => {
       return data;
     } catch (error) {
       console.error("❌ Error actualizando usuario:", error);
+
       throw error;
     }
   };
 
+  // ============================================================
+  // 🌎 CONTEXT
+  // ============================================================
+
   return (
     <CurrencyContext.Provider
       value={{
+        // Precios actuales
         currencies,
         loading,
         fetchData,
         updateOneFiatApi,
+
+        // Historial
+        snapshots,
+        historyPrices,
+        historyLoading,
+        fetchSnapshots,
+        fetchHistorySnapshot,
+        fetchHistoryByDate,
+        setHistoryPrices,
+
+        // Utilidades
         useMediaQuery,
+
+        // Auth
         auth,
         login,
         logout,
